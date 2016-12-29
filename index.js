@@ -1,37 +1,43 @@
 #!/usr/bin/env node
+var chalk = require('chalk');
+var exec = require('executive');
+var sync_exec = require('sync-exec');
 var co = require('co');
 var prompt = require('co-prompt');
 var program = require('commander');
+var sem = require('semaphore')(1);
+
+// Load other files
+var cmd_init = require("./commands/init.js");
+var init = new cmd_init(program, sem);
 
 // Main program
 program
   .version('0.0.1')
-  .option('-p, --project <project>', 'Switch to project before executing.', 'default')
+  .option('-b, --base <base>', 'Use a specific base project. (https://bitbucket.org/rails5docker/dev)', 'https://bitbucket.org/rails5docker/dev')
+  .option('-r, --remote <remote>', 'Use a specific remote. (origin)', 'origin')
+  .option('-p, --project <project>', 'Use a specific project. (default-project)', 'default-project')
 
 program
   .command('init')
   .description('Run interactive setup commands.')
-  .option('-o, --opt <opt>', 'Custom option.')
   .action(function(options){
-    var opt = options.opt || "default-opt";
-    console.log(opt)
-    init(program.project)
+    init.run()
   })
 
-function init(project){
-  co(function *() {
-    var username = yield prompt('username: ');
-    var password = yield prompt.password('password: ');
-    console.log('user: %s pass: %s project: %s',
-      username, password, project);
-  })
-}
-
+// Example
 program
   .command('print <str>')
   .description('Print random string.')
+  .option('-o, --opt <opt>', 'Custom option.')
   .action(function(str, options){
-    console.log('str: %s', str);
+    console.log(chalk.bold.green('str: ')+str);
+    co(function *() {
+      var username = yield prompt('username: ');
+      var password = yield prompt.password('password: ');
+      console.log('user: %s pass: %s',
+        username, password);
+    })
   })
 
 // Wrap up all the commands
