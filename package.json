@@ -1,6 +1,6 @@
 {
   "name": "mispistachos-cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A CLI that combines bitbucket, google cloud and kubernetes.",
   "main": "index.js",
   "scripts": {
