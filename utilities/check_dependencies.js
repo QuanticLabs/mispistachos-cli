@@ -1,38 +1,46 @@
 #!/usr/bin/env node
 var exec = require('executive');
+var cmd_ = require('./cmd.js');
+var sleep = require('sleep');
 
 var check = function (sem) {
   var self = this;
+  var cmd = new cmd_.Cmd()
 
   self.git = function () {
-    exec.quiet('git --version', function(err, stdout, stderr) {
+    cmd.sync('git --version', function(err, stdout, stderr) {
       if(err!=null){
-        console.log('Error: git not found')
+        console.log('Error: \'git\' not found')
+        process.exit()
       }
       else{
-        sem.leave([1])
+        console.log('\'git\' found')
       }
+
     })
   }
 
   self.docker = function () {
-    exec.quiet('docker -v', function(err, stdout, stderr) {
+    cmd.sync('docker -v', function(err, stdout, stderr) {
       if(err!=null){
-        console.log('Error: docker not found')
+        console.log('Error: \'docker\' not found')
+        process.exit()
       }
       else{
-        sem.leave([1])
+        console.log("\'docker\' found")
       }
     })
+
   }
 
   self.dockerCompose = function () {
-    exec.quiet('docker-compose -v', function(err, stdout, stderr) {
+    cmd.sync('docker-compose -v', function(err, stdout, stderr) {
       if(err!=null){
-        console.log('Error: docker-compose not found')
+        console.log('Error: \'docker-compose\' not found')
+        process.exit()
       }
       else{
-        sem.leave([1])
+        console.log("\'docker-compose\' found")
       }
     })
   }

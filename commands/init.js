@@ -1,48 +1,50 @@
 #!/usr/bin/env node
 var exec = require('executive');
 var co = require('co');
-var prompt = require('co-prompt');
+var _prompt = require('../utilities/prompt.js');
+var _cmd = require('../utilities/cmd.js');
 
 var init = function (program, sem) {
 
   // Load other files
   var check_dependencies = require("../utilities/check_dependencies.js");
   var check = new check_dependencies(sem);
-
+  var prompt = new _prompt.Prompt()
+  var cmd = new _cmd.Cmd()
   var self = this;
 
   self.run = function (){
-    // Check dependencies (git, gcloud, kubectl)
-    sem.take(1, check.git)
-    sem.take(1, check.docker)
-    sem.take(1, check.dockerCompose)
 
-    // We get the necessary info
-    sem.take(1, self.getEnvPass)
-    sem.take(1, self.getRepoFromRemote)
+    cmd.sync("cat /Users/gslopez/.ssh/id_rsa", function(a,b,c){
+      console.log(a)
+      console.log(b)
+      console.log(c)
+    })
+    // // Check dependencies (git, gcloud, kubectl)
+    // check.git()
+    // check.docker()
+    // check.dockerCompose()
 
-    // console.log(chalk.bold.green('str: ')+'test');
-    // program.base
+    // // We get the necessary info
+    // self.getEnvPass()
+    // self.getRepoFromRemote()
+    
   }
 
   self.getEnvPass = function (){
-    var lock = false;
-    co(function *() {
-      program.env_pass = yield prompt.password('Type the password for your environment variables: ');
 
-      // VALIDATE AND CONTINUE
-      if(!program.env_pass || program.env_pass==""){
-        console.log('Error: No password found.')
-      }
-      else{
-        sem.leave([1])
-      }
-    })
+    var password = prompt.password('Type the password for your environment variables: ')
+    if (password==null || password ==""){
+      console.log("Error: Invalid password")
+      process.exit()
+    }
+    program.env_pass = password
+
   }
 
   // Gets the BitBucket Team or Github Organization and the current project from the remote
   self.getRepoFromRemote = function (){
-    exec.quiet('git remote -v | grep '+program.remote, function(err, stdout, stderr) {
+    cmd.sync('git remote -v | grep '+program.remote, function(err, stdout, stderr) {
       var remotes = stdout.split('\n')
       var remote = remotes[0];
       // Ex: origin git@github.com:MisPistachos/mispistachos-cli.git (fetch)
@@ -59,9 +61,7 @@ var init = function (program, sem) {
       // VALIDATE AND CONTINUE
       if(!program.repo){
         console.log('Error: No repository found.')
-      }
-      else{
-        sem.leave([1])
+        process.exit()
       }
     })
   }

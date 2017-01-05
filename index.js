@@ -3,7 +3,6 @@ var chalk = require('chalk');
 var exec = require('executive');
 var sync_exec = require('sync-exec');
 var co = require('co');
-var prompt = require('co-prompt');
 var program = require('commander');
 var sem = require('semaphore')(1);
 
