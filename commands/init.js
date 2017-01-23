@@ -1,72 +1,79 @@
 #!/usr/bin/env node
-var exec = require('executive');
-var co = require('co');
-var _prompt = require('../utilities/prompt.js');
-var _cmd = require('../utilities/cmd.js');
+var prompt = require('../utilities/prompt.js');
+var cmd = require('../utilities/cmd.js');
+var config = require('../utilities/config.js');
 
-var init = function (program, sem) {
 
-  // Load other files
-  var check_dependencies = require("../utilities/check_dependencies.js");
-  var check = new check_dependencies(sem);
-  var prompt = new _prompt.Prompt()
-  var cmd = new _cmd.Cmd()
-  var self = this;
+var run = function (remote){
 
-  self.run = function (){
+  config.checkConfigOrCreate()
+  check("git", "git --version")
+  check("docker", "docker -v")
+  check("docker-compose", 'docker-compose -v')
 
-    cmd.sync("cat /Users/gslopez/.ssh/id_rsa", function(a,b,c){
-      console.log(a)
-      console.log(b)
-      console.log(c)
-    })
-    // // Check dependencies (git, gcloud, kubectl)
-    // check.git()
-    // check.docker()
-    // check.dockerCompose()
+  // We get the necessary info
+  getEnvPass()
+  getRepoFromRemote(remote)
+  
+}
 
-    // // We get the necessary info
-    // self.getEnvPass()
-    // self.getRepoFromRemote()
-    
-  }
-
-  self.getEnvPass = function (){
-
-    var password = prompt.password('Type the password for your environment variables: ')
-    if (password==null || password ==""){
-      console.log("Error: Invalid password")
+var check = function (commandName, command){
+  cmd.sync(command, function(err, stdout, stderr) {
+    if(err!=null){
+      console.log('Error: \''+commandName+'\' not found')
       process.exit()
     }
-    program.env_pass = password
+    else{
+      console.log('\''+commandName+'\' found')
+    }
+
+  })
+}
+
+
+  var getEnvPass = function (){
+    var password = prompt.password('Type the password for your environment variables: ')
+    if (password === null || password === ""){
+      console.log("Error: Invalid password")
+      process.exit()
+    }else{
+      config.values.cli.password = password
+      config.save("cli")
+      console.log("Password saved")
+
+    }
 
   }
 
   // Gets the BitBucket Team or Github Organization and the current project from the remote
-  self.getRepoFromRemote = function (){
-    cmd.sync('git remote -v | grep '+program.remote, function(err, stdout, stderr) {
+  var getRepoFromRemote = function (remote){
+    cmd.sync('git remote -v | grep '+remote, function(err, stdout, stderr) {
       var remotes = stdout.split('\n')
       var remote = remotes[0];
+
       // Ex: origin git@github.com:MisPistachos/mispistachos-cli.git (fetch)
       // Ex: origin git@bitbucket.org:MisPistachos/mispistachos-cli.git (fetch)
       var offset_host = remote.indexOf("git@")
       var offset_middle = remote.indexOf(":", offset_host)
       var offset_end = remote.indexOf("/",offset_middle)
-      program.team = remote.substr(offset_middle+1,offset_end-offset_middle-1)
+      var team = remote.substr(offset_middle+1,offset_end-offset_middle-1)
       // Ex: MisPistachos
       var offset_repo = remote.indexOf(".git",offset_end)
-      program.repo = remote.substr(offset_end+1,offset_repo-offset_end-1)
+      var repo = remote.substr(offset_end+1,offset_repo-offset_end-1)
       // Ex: mispistachos-cli
       
       // VALIDATE AND CONTINUE
-      if(!program.repo){
+      if(!repo){
         console.log('Error: No repository found.')
         process.exit()
+      }else{
+        console.log('Repository found')
       }
     })
   }
 
-}
 
 
-module.exports = init;
+
+
+module.exports = run;

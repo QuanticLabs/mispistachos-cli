@@ -2,12 +2,17 @@
 
 var exec = require('executive');
 
-var cmd = function(){
+var Cmd = function(){
+
+
+  //callback: function(err, stdout, stderr){}
+
   // https://www.npmjs.com/package/executive
   this.exec = function(command, options = {}, callback){
     exec.quiet(command, options, callback)
   }
 
+  //callback: function(err, stdout, stderr){}
   this.sync = function(command, callback){
     this.exec(command,{sync: true}, callback)
   }
@@ -17,6 +22,4 @@ var cmd = function(){
   }
 }
 
-module.exports = {
-  Cmd: cmd
-}
+module.exports = new Cmd()

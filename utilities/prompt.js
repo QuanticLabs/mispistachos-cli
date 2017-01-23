@@ -3,7 +3,7 @@
 var promptSync = require('prompt-sync')()
 
 
-var prompt = function(){
+var Prompt = function(){
 
   
   this.input = function(message){
@@ -27,6 +27,4 @@ var prompt = function(){
 
 }
 
-module.exports = {
-  Prompt: prompt
-}
+module.exports = new Prompt();
