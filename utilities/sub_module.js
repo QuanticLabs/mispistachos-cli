@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 var get = require('get-parameter-names')
 
-var SubModule = function(name, generalHelp,actionNames, actionHelps, actionFunctions){
+var SubModule = function(name, generalHelp, moduleAlias){
 
   this.name = name
+  this.moduleAlias = moduleAlias
   this.generalHelp = generalHelp
   
-  actionNames=actionNames||[]
-  actionHelps=actionHelps||[]
-  actionFunctions=actionFunctions||[]
+  actionNames=[]
+  actionHelps=[]
+  actionFunctions=[]
   var Action = function(name, help, func){
     this.name = name;
     this.help = help;
@@ -54,14 +55,17 @@ var SubModule = function(name, generalHelp,actionNames, actionHelps, actionFunct
   this.exec = function(actionName){
     var action = this.actionsHash[actionName];
 
-    var args = Object.values(arguments).slice(1)
+    // console.log(arguments)
 
+    var args = Object.values(arguments).slice(1)[0]
+    args = Object.values(args).slice(1, -1)
     if(action === undefined || action === null){
       console.log('Subcommand definition error: Action "'+actionName+'" doesn\'t exist. Try running ' + helpCommand()) 
       process.exit()
     }
 
-    if(action.funcParams.length < args.length){
+    // console.log(action)
+    if(args.length < action.funcParams.length){
       console.log('Arguments doesn\'t match: Try running ' + helpCommand()) 
       process.exit()
     }

@@ -2,11 +2,6 @@
 
 //requires
 var program = require('commander');
-var gcloud = require("./utilities/gcloud.js");
-var cmd_init = require("./commands/init.js");
-
-// get objects
-
 
 // Main program
 program
