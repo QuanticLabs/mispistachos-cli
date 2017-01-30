@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-var prompt = require('../utilities/prompt.js');
-var cmd = require('../utilities/cmd.js');
-var config = require('../utilities/config.js');
+var prompt = require(__base+'/utilities/prompt.js');
+var cmd = require(__base+'/utilities/cmd.js');
+var config = require(__base+'/utilities/config.js');
 
 
 var run = function (remote){
@@ -73,7 +73,16 @@ var check = function (commandName, command){
   }
 
 
+  var load= function(subProgram){
+    subProgram
+    .command('init')
+    .description('Run interactive setup commands')
+    .action(function(options){
+      run()
+    })
+  }
 
 
 
-module.exports = run;
+
+module.exports = load;
