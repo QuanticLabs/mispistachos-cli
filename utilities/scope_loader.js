@@ -21,6 +21,12 @@ var _getProgram = function(scopeFolder){
     .description(scope.description)
     .version('0.0.1')
 
+  for (var i = 0; i < scope.options.length; i++){
+    var option = scope.options[i]
+    subProgram
+      .option("-"+option.alias+", --"+ option.name+" ["+option.name+"]", option.description)
+  }
+
   var files = fileUtils.getFiles(folderPath)
   for (var i = 0; i < files.length; i++){
     var fileName = files[i]

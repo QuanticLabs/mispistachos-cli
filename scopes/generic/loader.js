@@ -8,4 +8,5 @@ module.exports = {
   description: _description,
   alias: _alias,
   name: _name,
+  options: []
 }

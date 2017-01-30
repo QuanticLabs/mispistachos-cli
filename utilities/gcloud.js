@@ -10,61 +10,109 @@ var project = function(id, name, number){
 }
 
 var GCloud = function(){
+
+
+
   this.listProjects = function(){
+    var projectsHash = {}
     cmd.sync("gcloud projects list", function(err, stdout, stderr){
-      console.log(stdout);
-    })
+      var projects = stdout.split("\n")
+      var headers = projects.shift()
+      headers= "\t" + headers
+      projects.pop()
+      console.log(headers)
+
+      if(projects.length > 0){
+        for (var i = 0; i < projects.length; i++) {
+          projectsHash[i] = projects[i].split(" ").diff([""])[0]
+          projects[i] = "("+i+")\t"+projects[i]
+          console.log(projects[i])
+        }
+
+      }else{
+        console.log("Projects not found. Try creating a new project")
+      }
+
+    });
+    return projectsHash
   }
 
-  this.setProject = function(projectId,clusterId){
-    cmd.sync("gcloud config set project "+projectId, function(err, stdout, stderr){
-      print(err,stdout,stderr)
-    })
-    this.setCluster(clusterId)
+  this.setProject = function(projectId){
+    var projectName = projectId;
+    if(!projectId){
+      var projectsHash = this.listProjects()
+      projectId = prompt.input("Select in which project you will work: ")
+
+      var toInt = parseInt(projectId)
+      if(!isNaN(toInt)){
+        projectName = projectsHash[parseInt(projectId)]
+      }else{
+        projectName = projectId
+      }
+    }
+
+    if(!!projectName){
+      cmd.sync("gcloud config set project "+projectName, print)  
+    }
+    
   }
 
-  this.setCluster = function(clusterId){
-    var clusterName = clusterId;
-    if(!clusterId){
-      cmd.sync("gcloud container clusters list", function(err, stdout, stderr){
+
+  this.listClusters = function(){
+    var clustersHash = {}
+    cmd.sync("gcloud container clusters list", function(err, stdout, stderr){
         var clusters = stdout.split("\n")
         var headers = clusters.shift()
         headers= "\t" + headers
         clusters.pop()
         console.log(headers)
+
         if(clusters.length > 0){
-          var hash = {}
           for (var i = 0; i < clusters.length; i++) {
-            
-            hash[i] = clusters[i].split(" ")[0]
+            var splitted = clusters[i].split(" ").diff([""])
+            clustersHash[i] = {name: splitted[0], zone: splitted[1]}
+            clustersHash[splitted[0]] = {name: splitted[0], zone: splitted[1]}
             clusters[i] = "("+i+")\t"+clusters[i]
             console.log(clusters[i])
           }
 
-          
-          clusterId = prompt.input("Select which cluster you will use: ")
-          var toInt = parseInt(clusterId)
-          if(!isNaN(toInt)){
-            clusterName = hash[parseInt(clusterId)]
-          }else{
-            clusterName = clusterId
-          }
+
 
         }else{
           console.log("Cluster not found. Try creating a new cluster")
         }
 
-      });
+    });
+    return clustersHash
+  }
+
+  this.setCluster = function(clusterId, clusterZone){
+    var clusterName = clusterId;
+    if(!clusterId){
+      
+      var clustersHash = this.listClusters()
+      clusterId = prompt.input("Select which cluster you will use: ")
+      var toInt = parseInt(clusterId)
+      if(!isNaN(toInt)){
+        clusterName = clustersHash[toInt].name
+        clusterZone = clustersHash[toInt].zone
+      }else{
+        clusterName = clustersHash[clusterId].name
+        clusterZone = clustersHash[clusterId].zone
+      }
     }
 
-    cmd.sync("gcloud container clusters get-credentials "+clusterName, print)
-
+    
+      if(!!clusterZone){
+        cmd.sync("gcloud container clusters get-credentials "+clusterName+" --zone="+clusterZone, print)
+      }else{
+        cmd.sync("gcloud container clusters get-credentials "+clusterName, print)
+      }
+    }
   }
    
   this.getCurrentProject = function(){
-    cmd.sync("gcloud config get-value project", function(err, stdout, stderr){
-      console.log(stdout);
-    })
+    cmd.sync("gcloud config get-value project", print)
   }
 
   var print = function(err, stdout, stderr){
