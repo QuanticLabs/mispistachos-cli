@@ -1,16 +1,16 @@
 
 var gcloud = require('../../utilities/gcloud.js')
 
-var run = function(projectId){
-  gcloud.setProject(projectId);
+var run = function(projectId, clusterId){
+  gcloud.setProject(projectId, clusterId);
 }
 
 var load= function(program){
   program
-  .command('set <projecIid>')
-  .description('Set current project')
-  .action(function(projectId){
-    run(projectId)
+  .command('set <PROJECT_ID> [CLUSTER_ID]')
+  .description('Set the default project')
+  .action(function(projectId,clusterId){
+    run(projectId,clusterId)
   })
 }
 

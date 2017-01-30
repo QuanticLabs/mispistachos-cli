@@ -76,7 +76,7 @@ var check = function (commandName, command){
   var load= function(subProgram){
     subProgram
     .command('init')
-    .description('Run interactive setup commands')
+    .description('Run setup commands')
     .action(function(options){
       run()
     })
