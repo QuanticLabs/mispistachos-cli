@@ -9,6 +9,7 @@ var Config = function(){
 
   var paths = {
     cli: mainFolder + "/cli.json",
+    bb: mainFolder + "/bb.json",
     k8s: mainFolder + "/k8s.json",
     gcloud: mainFolder + "/gcloud.json"
   }
@@ -17,8 +18,13 @@ var Config = function(){
     k8s: {
 
     },
+    bb: {
+      key: "",
+      secret: ""
+    },
     cli: {
-      password: null
+      password: null,
+      defaultInit: "git@bitbucket.org:rails5docker/dev.git"
     },
     gcloud: {
       projectId: "XXXX",
@@ -28,13 +34,26 @@ var Config = function(){
 
   this.checkConfigOrCreate = function(){
     cmd.sync("mkdir -p " + mainFolder, null)
-    cmd.sync("touch " + paths.k8s, null)
-    cmd.sync("touch " + paths.cli, null)
-    cmd.sync("touch " + paths.gcloud, null)
+
+    var keys = Object.keys(paths)
+    for (var i = 0; i< keys.length; i++) {
+      var key = keys[i]
+      cmd.sync("touch " + paths[key], null)
+    }
+    // cmd.sync("touch " + paths.k8s, null)
+    // cmd.sync("touch " + paths.cli, null)
+    // cmd.sync("touch " + paths.gcloud, null)
   }
 
   var read = function(filePath){
-    var config = jsonFile.readFileSync(filePath)
+
+    var config = {}
+
+    try{
+      config = jsonFile.readFileSync(filePath)
+    }catch(err){
+      config = {}
+    }
     if (config === undefined || config === null)
       return {}
     return config
@@ -47,8 +66,9 @@ var Config = function(){
 
   this.reloadAll = function(){
     var keys = Object.keys(paths)
-    for (var key in keys) {
-        this.reload(key)
+    for (var i = 0; i< keys.length; i++) {
+      var key = keys[i]
+      this.reload(key)
     }
   }
 
@@ -59,11 +79,16 @@ var Config = function(){
 
   this.saveAll = function(){
     var keys = Object.keys(paths)
-    for (var key in keys) {
-        this.save(key)
+
+    for (var i = 0; i< keys.length; i++) {
+      var key = keys[i]
+
+      this.save(key)
     }
   }
 
 }
-
-module.exports = new Config()
+var config = new Config()
+config.checkConfigOrCreate()
+config.reloadAll()
+module.exports = config 

@@ -3,8 +3,6 @@
 var exec = require('executive');
 
 var Cmd = function(){
-
-
   //callback: function(err, stdout, stderr){}
 
   // https://www.npmjs.com/package/executive

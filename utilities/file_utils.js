@@ -19,6 +19,13 @@ var FileUtils = function(){
       return fs.statSync(path.join(srcpath, file)).isDirectory();
     });
   }
+
+  this.exists = function(srcpath){
+    if (fs.existsSync(srcpath)) {
+        return true
+    }
+    return false
+  }
 }
 
 module.exports = new FileUtils()

@@ -6,11 +6,28 @@ A CLI that combines bitbucket, google cloud and kubernetes.
 Clone the repo and link it using these commands:
 ```
 $ npm install -g mispistachos-cli
-$ mp init
-$ mp -h
+
 ```
 
-## Getting Started
+#Getting Started
+
+## Install bitbucket-cli
+npm install -g bitbucket-cli
+
+## Get bitbucket OAuth token
+1.- Go to https://bitbucket.org/account/user/<YOUR_USER>/api
+2.- Go to OAuth
+3.- Generate a new OAuth token
+
+
+## Init project
+
+```
+$ mp init
+$ mp -h
+
+```
+
 ...
 
 ## Collaborate

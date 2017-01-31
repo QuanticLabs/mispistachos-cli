@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
-
 var scope = require(__base+"utilities/scope.js")
-var _description = 'Manage projects in Google Cloud'
-var _alias = "p"
-var _name = "projects"
+
+var _description = 'Manage projects in local and bitbucket repository'
+var _alias = "r"
+var _name = "remote"
 
 
 var _options = [
-  new scope.Option("z", "zone", "GCP project zone")
+  new scope.Option("t", "team", "Project team name (must exist)")
 ] 
 
 module.exports = {

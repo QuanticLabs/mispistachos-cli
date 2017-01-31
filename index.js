@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 
+global.__base = __dirname + '/';
+
 //requires
 var scopeLoader = require("./utilities/scope_loader.js")
 var fileUtils = require('./utilities/file_utils.js');
+var config = require(__base+'/utilities/config.js');
 
 //Array diff
 Array.prototype.diff = function(a) {
     return this.filter(function(i) {return a.indexOf(i) < 0;});
 };
-global.__base = __dirname + '/';
 
 // // Main program
 // program
@@ -19,8 +21,13 @@ global.__base = __dirname + '/';
 
 
 
-var scopeFolders = fileUtils.getFolders("./scopes")
 
+
+var scopeFolders = fileUtils.getFolders(__base+"scopes")
+
+
+config.checkConfigOrCreate();
+config.saveAll();
 
 var commandFolderHash = {}
 

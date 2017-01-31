@@ -89,7 +89,7 @@ var GCloud = function(){
   this.setCluster = function(clusterId, clusterZone){
     var clusterName = clusterId;
     if(!clusterId){
-      
+
       var clustersHash = this.listClusters()
       clusterId = prompt.input("Select which cluster you will use: ")
       var toInt = parseInt(clusterId)
@@ -102,13 +102,12 @@ var GCloud = function(){
       }
     }
 
-    
+
       if(!!clusterZone){
         cmd.sync("gcloud container clusters get-credentials "+clusterName+" --zone="+clusterZone, print)
       }else{
         cmd.sync("gcloud container clusters get-credentials "+clusterName, print)
       }
-    }
   }
    
   this.getCurrentProject = function(){

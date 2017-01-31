@@ -2,7 +2,7 @@
 
 var cmd = require('./cmd.js')
 
-var project = function(id, name, number){
+var K8S = function(id, name, number){
   this.id = id;
   this.name = name;
   this.number = number
