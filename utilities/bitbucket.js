@@ -12,18 +12,34 @@ var project = function(id, name, number){
   this.number = number
 }
 
-var Bitbucket = function(){
+var Bitbucket = function(projectPath){
   
+  this.projectPath = projectPath
 
-  this.cloneDefaultInit = function(projectFolderPath, projectName){
-    if(!!projectName){
-      if(!fileUtils.exists(projectFolderPath+"/"+projectName)){
+
+  var cmdInProjectPath = function(command, callback){
+    cmd.sync("\
+      cd "+ projectPath +" && \
+      "+command, callback)
+  }
+
+  var bbCommand = function (bitbucketCommand, callback, projectFolder=true){
+    var command = "BITBUCKET_KEY="+config.values.bb.key+" BITBUCKET_SECRET="+config.values.bb.secret+" "+binPath+" "+bitbucketCommand
+    if(projectFolder)
+      cmdInProjectPath(command, callback)
+    else
+      cmd.sync(command, callback)
+  }
+
+  this.cloneDefaultInit = function(){
+    if(!!projectPath){
+      if(!fileUtils.exists(projectPath)){
         console.log("Cloning project")
-        cmd.sync("git clone "+config.values.cli.defaultInit+" "+projectName, nothing)
+        cmd.sync("git clone "+config.values.cli.defaultInit+" "+projectPath, nothing)
         console.log("Project clone finished")
         return true
       }else{
-        console.log("ERROR: Folder '"+projectName+"' exists")
+        console.log("ERROR: Folder '"+projectPath+"' exists")
       }
       
     }
@@ -32,11 +48,7 @@ var Bitbucket = function(){
   }
 
 
-  var bbCommand = function (bitbucketCommand, callback){
-    var command = "BITBUCKET_KEY="+config.values.bb.key+" BITBUCKET_SECRET="+config.values.bb.secret+" "+binPath+" "+bitbucketCommand
-    // console.log(command)
-    cmd.sync(command, callback)
-  }
+ 
 
   this.touchTeam = function(teamName){
     var teamExist = false
@@ -50,23 +62,20 @@ var Bitbucket = function(){
       }
 
       print(err, stdout, stderr)
-    })
+    },false)
     return teamExist
   }
 
-  this.addRemote = function(projectPath, remoteName, gitUrl){
+  this.addRemote = function(remoteName, gitUrl){
 
-    this.removeRemote(projectPath, remoteName)
-    cmd.sync("\
-      cd "+projectPath+" && \
-      git remote add "+remoteName+" "+gitUrl, print)
-
+    this.removeRemote(remoteName)
+    cmdInProjectPath("git remote add "+remoteName+" "+gitUrl, print)
     console.log("Remote '"+remoteName+"' added")
   }
 
   this.createRemoteRepository= function(projectTeamId, repositoryName){
     var created = false
-    bbCommand("create-repository "+projectTeamId+" "+repositoryName,function(err, stdout, stderr){
+    bbCommand("create-repository -p "+projectTeamId+" "+repositoryName,function(err, stdout, stderr){
       // console.log('TEST')
       // print(err,stdout,stderr)
       if(stdout.indexOf("Error: ") > -1){
@@ -81,10 +90,57 @@ var Bitbucket = function(){
     return created
   }
 
-  this.removeRemote = function(projectPath, remoteName){
+  this.updateSubmodules= function(){
+    console.log("Initializing submodules")
+    cmdInProjectPath("git submodule init && git submodule update",print)
+  }
 
-    cmd.sync("cd "+projectPath+" && \
-      git remote rm "+remoteName, nothing)
+  this.setSubmoduleOrigin = function(submoduleName, gitNewOrigin){
+   cmdInProjectPath("git config --file=.gitmodules submodule."+submoduleName+".url "+gitNewOrigin)
+  }
+
+  this.syncSubmodules = function(){
+    console.log("Synchronizing submodules")
+    cmdInProjectPath("git submodule sync && \
+      git submodule update --init --recursive --remote")
+    console.log("Submodules Synchronized")
+
+  }
+
+  this.pushSubmodule = function(submoduleName){
+    console.log("Pushing submodule '"+submoduleName+"' to a new repository")
+    cmdInProjectPath("cd "+submoduleName+" && \
+      git add --all && \
+      git commit -m 'first commit'",print)
+
+    cmdInProjectPath("cd "+submoduleName+" && \
+      git push origin master",print)
+  }
+
+  this.pushProject = function(){
+    console.log("Pushing project to the new repository")
+    cmdInProjectPath("git add --all && \
+      git commit -m 'first commit'",print)
+
+    cmdInProjectPath("git push origin master",print)
+  }
+
+  this.getSubmoduleNames = function(){
+    console.log("Fetching submodules")
+    var submodules = []
+    cmdInProjectPath("git config --file .gitmodules --get-regexp path | awk '{ print $2 }'", function(err, stdout, stderr){
+      if(checkError(err,stdout,stderr)){
+        print("Error fetching submodules")
+      }
+      submodules = stdout.split("\n")
+      submodules = submodules.diff([""])
+    })
+    console.log("\t"+submodules+" found")
+    return submodules
+  }
+
+  this.removeRemote = function(remoteName){
+    cmdInProjectPath("git remote rm "+remoteName, nothing)
     console.log("Remote '"+remoteName+"' removed")
   }
 
@@ -119,7 +175,14 @@ var Bitbucket = function(){
     
   }
 
-   var print = function(err, stdout, stderr){
+  var checkError = function(err, stdout, stderr){
+    if(stdout.indexOf("Error: ") > -1 || !!err || !!stderr){
+      return true
+    }
+    return false
+  }
+
+  var print = function(err, stdout, stderr){
     if(!!err){
       // console.log("err");
       console.log(err);
@@ -147,4 +210,4 @@ var Bitbucket = function(){
   }
 }
 
-module.exports = new Bitbucket()
+module.exports = Bitbucket

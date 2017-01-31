@@ -1,4 +1,4 @@
-var bitbucket = require(__base+'utilities/bitbucket.js')
+var Bitbucket = new require(__base+'utilities/bitbucket.js')
 var cmd = require(__base+'utilities/cmd.js')
 var prompt = require(__base+'utilities/prompt.js')
 var config = require(__base+'utilities/config.js')
@@ -20,6 +20,8 @@ If you have not created it yet, you can do here:\n\
     process.exit()
   }
 
+  var projectPath = userPath + "/" + projectName
+  var bitbucket = new Bitbucket(projectPath); 
   if(!bitbucket.touchTeam(teamId)){
     console.log("Team doesn't exists")  
     process.exit()
@@ -27,14 +29,35 @@ If you have not created it yet, you can do here:\n\
     console.log("Team fetched from bitbucket")  
    }
 
-  if (bitbucket.cloneDefaultInit(userPath, projectName)){
-    var projectPath = userPath + "/" + projectName
-    bitbucket.addRemote(projectPath, "defaultinit", config.values.cli.defaultInit)
+  if (bitbucket.cloneDefaultInit(projectName)){
+    bitbucket.addRemote("defaultinit", config.values.cli.defaultInit)
 
     // var repositoryName = projectName.replace(/\W/g, '').toLowerCase()
     var repositoryName = "dev"
     if(bitbucket.createRemoteRepository(teamId, repositoryName)){
-      bitbucket.addRemote(projectPath, "origin", "git@bitbucket.org:"+teamId+"/"+repositoryName+".git")
+      bitbucket.addRemote("origin", "git@bitbucket.org:"+teamId+"/"+repositoryName+".git")
+      bitbucket.updateSubmodules()
+      bitbucket.pushProject()
+
+      var submoduleNames = bitbucket.getSubmoduleNames()
+
+      for(var i = 0; i< submoduleNames.length; i++){
+        var submoduleName = submoduleNames[i]
+        if(bitbucket.createRemoteRepository(teamId, submoduleName)){
+          var repoUrl = "git@bitbucket.org:"+teamId+"/"+submoduleName+".git"
+          bitbucket.setSubmoduleOrigin(submoduleName, repoUrl)
+          
+        }
+      }
+      bitbucket.syncSubmodules()
+
+      for(var i = 0; i< submoduleNames.length; i++){
+        var submoduleName = submoduleNames[i]
+        bitbucket.pushSubmodule(submoduleName)
+      }
+
+
+
 
     }
   }
