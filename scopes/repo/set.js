@@ -8,11 +8,12 @@ var run = function(teamId,repositoryId){
   var bitbucket = new Bitbucket(process.cwd())
   if(!teamId){
     teamId = bitbucket.teamName
+    if(!repositoryId){
+      repositoryId = bitbucket.repositoryName
+    }
   }
 
-  if(!repositoryId){
-    repositoryId = bitbucket.repositoryName
-  }
+  
   bitbucketPipeline = new BitbucketPipeline(teamId)
   var configPath = process.cwd()+"/config/bitbucket.yml"
   var variablesHash = null
