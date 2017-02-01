@@ -96,6 +96,28 @@ var BitbucketPipeline = function(teamId){
   }
 
 
+
+  var del = function(path, data){
+
+    if(accessToken == null)
+      setAccessToken()
+
+    var url = endpoint+path
+    console.log("url")
+    console.log(url)
+
+    // console.log("accessToken")
+    // console.log(accessToken)
+
+    var res = request('DELETE', url, {
+      'headers': {
+        'Authorization': "Bearer "+accessToken
+      }
+    });
+    return res
+  }
+
+
   var getConfigVariable = function(url, print){
     var variables = []
     var variablesHash = {}
@@ -106,7 +128,7 @@ var BitbucketPipeline = function(teamId){
     var variablesJson = responseJson.values
     if(print)
       console.log("KEY\tVALUE")
-    for(var i =0;i<variablesJson.length;i++){
+    for(var i =0; i<variablesJson.length; i++){
       var variableJson = variablesJson[i]
       var variable = new Variable(variableJson.key, variableJson.uuid, variableJson.value)
 
@@ -198,13 +220,33 @@ var BitbucketPipeline = function(teamId){
   }
 
 
+   var unsetConfigVariable = function(variablesHash,createUrl,variableKey){
+    var variable = variablesHash[variableKey]
+    // console.log(variablesHash)
+    var changed = true
+    if(!variable){
+      console.log("'"+variableKey+"' does not exist")
+      return
+    }
+
+
+    var data = {}
+
+    var deleteUrl = createUrl+variable.uuid
+    response = del(deleteUrl, data)
+
+    response = response.body.toString('utf8')
+    console.log("Variable '"+variable.key+"' deleted")
+  }
+
+
   this.setRepositoryConfigVariable = function(repositoryId, variableKey,variableValue, cachedVariablesHash=null){
 
     var variablesHash = null
     if(!!cachedVariablesHash){
       variablesHash = cachedVariablesHash
     }else{
-      variablesHash = this.getRepositoryConfigVariables(false);
+      variablesHash = this.getRepositoryConfigVariables(repositoryId,false);
     }
 
     var createUrl = "repositories/"+teamId+"/"+repositoryId+"/pipelines_config/variables/"
@@ -212,7 +254,7 @@ var BitbucketPipeline = function(teamId){
   }
 
 
-  this.setTeamConfigVariable = function(variableKey,variableValue, cachedVariablesHash=null){
+  this.setTeamConfigVariable = function(variableKey, cachedVariablesHash=null){
 
     var variablesHash = null
     if(!!cachedVariablesHash){
@@ -223,6 +265,35 @@ var BitbucketPipeline = function(teamId){
 
     var createUrl = "teams/"+teamId+"/pipelines_config/variables/"
     setConfigVariable(variablesHash,createUrl, variableKey, variableValue)    
+  }
+
+
+  this.unsetRepositoryConfigVariable = function(repositoryId, variableKey, cachedVariablesHash=null){
+
+    var variablesHash = null
+    if(!!cachedVariablesHash){
+      variablesHash = cachedVariablesHash
+    }else{
+      variablesHash = this.getRepositoryConfigVariables(repositoryId,false);
+     
+    }
+
+    var createUrl = "repositories/"+teamId+"/"+repositoryId+"/pipelines_config/variables/"
+    unsetConfigVariable(variablesHash,createUrl, variableKey)    
+  }
+
+
+  this.unsetTeamConfigVariable = function(variableKey, cachedVariablesHash=null){
+
+    var variablesHash = null
+    if(!!cachedVariablesHash){
+      variablesHash = cachedVariablesHash
+    }else{
+      variablesHash = this.getTeamConfigVariables(false);
+    }
+
+    var createUrl = "teams/"+teamId+"/pipelines_config/variables/"
+    unsetConfigVariable(variablesHash,createUrl,variableKey)    
   }
 
 }
