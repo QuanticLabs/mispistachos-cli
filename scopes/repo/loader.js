@@ -8,7 +8,8 @@ var _name = "remote"
 
 
 var _options = [
-  new scope.Option("t", "team", "Project team name (must exist)")
+  new scope.Option("t", "team", "Project team id (must exist)"),
+  new scope.Option("r", "repository", "Repository name (must exist)")
 ] 
 
 module.exports = {

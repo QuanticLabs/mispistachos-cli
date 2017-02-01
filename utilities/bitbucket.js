@@ -151,6 +151,7 @@ var Bitbucket = function(projectPath){
     var username = prompt.input("Type your bitbucket username: ")
     console.log("Enter your bitbucket OAuth credentials. You can find them here:")
     console.log("https://bitbucket.org/account/user/"+username+"/api")
+    console.log("Warning: You MUST set the variable Callback URL")
     var key = ""
     var secret = ""
     if(checkInput(username)){

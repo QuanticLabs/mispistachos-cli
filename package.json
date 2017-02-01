@@ -37,7 +37,10 @@
     "prompt-sync": "git://github.com/0x00A/prompt-sync.git#babc1da2b4e0dc20bc3884a595b3bfcad96711c2",
     "semaphore": "^1.0.5",
     "sleep": "^5.0.0",
-    "sync-exec": "^0.6.2"
+    "sync-exec": "^0.6.2",
+    "sync-request": "^4.0.1",
+    "write": "^0.3.2",
+    "yamljs": "^0.2.8"
   },
   "bugs": {
     "url": "https://github.com/MisPistachos/mispistachos-cli/issues"

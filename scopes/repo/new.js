@@ -37,7 +37,7 @@ If you have not created it yet, you can do here:\n\
     if(bitbucket.createRemoteRepository(teamId, repositoryName)){
       bitbucket.addRemote("origin", "git@bitbucket.org:"+teamId+"/"+repositoryName+".git")
       bitbucket.updateSubmodules()
-      bitbucket.pushProject()
+
 
       var submoduleNames = bitbucket.getSubmoduleNames()
 
@@ -56,8 +56,7 @@ If you have not created it yet, you can do here:\n\
         bitbucket.pushSubmodule(submoduleName)
       }
 
-
-
+      bitbucket.pushProject()
 
     }
   }
