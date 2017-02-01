@@ -1,4 +1,5 @@
 var Bitbucket = new require(__base+'utilities/bitbucket.js')
+var BitbucketPipeline = new require(__base+'utilities/bitbucket-pipelines.js')
 var cmd = require(__base+'utilities/cmd.js')
 var prompt = require(__base+'utilities/prompt.js')
 var config = require(__base+'utilities/config.js')
@@ -22,10 +23,12 @@ If you have not created it yet, you can do here:\n\
 
   var projectPath = userPath + "/" + projectName
   var bitbucket = new Bitbucket(projectPath); 
+  var bitbucketPipeline = null
   if(!bitbucket.touchTeam(teamId)){
     console.log("Team doesn't exists")  
     process.exit()
    }else{
+    bitbucketPipeline = new BitbucketPipeline(teamId); 
     console.log("Team fetched from bitbucket")  
    }
 
@@ -54,6 +57,7 @@ If you have not created it yet, you can do here:\n\
       for(var i = 0; i< submoduleNames.length; i++){
         var submoduleName = submoduleNames[i]
         bitbucket.pushSubmodule(submoduleName)
+        bitbucketPipeline.enablePipelinesForRepository(submoduleName)
       }
 
       bitbucket.pushProject()

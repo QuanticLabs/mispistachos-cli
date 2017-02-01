@@ -140,17 +140,26 @@ var BitbucketPipeline = function(teamId){
 
   }
 
-  this.setTeamConfigVariable = function(variableKey,variableValue, cachedVariablesHash=null){
-    var variablesHash = null
-    if(!!cachedVariablesHash){
-      variablesHash = cachedVariablesHash
-    }else{
-      variablesHash = this.getTeamConfigVariables(false);
-    }
-    
-    var variable = variablesHash[variableKey]
 
-    var changed = false
+  this.enablePipelinesForRepository= function(repositoryId){
+    var data = {enabled: true}
+    var response = put("repositories/"+teamId+"/"+repositoryId+"/pipelines_config", data)
+    console.log("Pipelines enabled for "+repositoryId)
+  }
+
+
+  // this.enablePipelines= function(repositoryId){
+  //   var data = {enabled: true}
+  //   var response = put("/repositories/"+teamId+"/"+repositoryId+"/pipelines_config", data)
+  //   console.log(response)
+  // }
+
+
+
+  var setConfigVariable = function(variablesHash,createUrl, variableKey, variableValue){
+    var variable = variablesHash[variableKey]
+    // console.log(variablesHash)
+    var changed = true
     if(!variable){
       variable = new Variable(variableKey, null, variableValue)
     }else{
@@ -178,15 +187,42 @@ var BitbucketPipeline = function(teamId){
     var response = null
 
     if(!!variable.uuid){
-      var url = "teams/"+teamId+"/pipelines_config/variables/"+variable.uuid 
-      response = put(url, data)
+      var updateUrl = createUrl+variable.uuid
+      response = put(updateUrl, data)
     }else{
-      var url = "teams/"+teamId+"/pipelines_config/variables/" 
-      response = post(url, data)
+      response = post(createUrl, data)
     }
-
     response = response.body.toString('utf8')
     console.log("Variable '"+variable.key+"' updated to '"+variable.value+"'")
+    // console.log(response)
+  }
+
+
+  this.setRepositoryConfigVariable = function(repositoryId, variableKey,variableValue, cachedVariablesHash=null){
+
+    var variablesHash = null
+    if(!!cachedVariablesHash){
+      variablesHash = cachedVariablesHash
+    }else{
+      variablesHash = this.getRepositoryConfigVariables(false);
+    }
+
+    var createUrl = "repositories/"+teamId+"/"+repositoryId+"/pipelines_config/variables/"
+    setConfigVariable(variablesHash,createUrl, variableKey, variableValue)    
+  }
+
+
+  this.setTeamConfigVariable = function(variableKey,variableValue, cachedVariablesHash=null){
+
+    var variablesHash = null
+    if(!!cachedVariablesHash){
+      variablesHash = cachedVariablesHash
+    }else{
+      variablesHash = this.getTeamConfigVariables(false);
+    }
+
+    var createUrl = "teams/"+teamId+"/pipelines_config/variables/"
+    setConfigVariable(variablesHash,createUrl, variableKey, variableValue)    
   }
 
 }
