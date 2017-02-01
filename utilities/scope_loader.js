@@ -45,7 +45,7 @@ var _getProgram = function(scopeFolder){
         var scope = require(__base+"scopes/"+folder+"/loader.js");
 
         subProgram
-          .command(scope.name)
+          .command(scope.name, {noHelp: false})
           .alias(scope.alias)
           .description(scope.description)
           .action(function(){})
@@ -69,7 +69,7 @@ var _loadHeaderToProgram = function(scopeFolderPath, program){
   var scope = require(scopeFolderPath+"/loader.js");
 
   program
-    .command(scope.name)
+    .command(scope.name, {noHelp: false})
     .alias(scope.alias)
     .description(scope.description)
     .action(function(){

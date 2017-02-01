@@ -16,12 +16,24 @@ var Bitbucket = function(projectPath){
   
   this.projectPath = projectPath
 
+  var team = null
+  var repository = null
 
   var cmdInProjectPath = function(command, callback){
     cmd.sync("\
       cd "+ projectPath +" && \
       "+command, callback)
   }
+
+
+  cmdInProjectPath("git remote -v", function(err, stdout, stderr){
+    var matches = stdout.match(/origin.+git@.+:(.+)\/(.+)\./i)
+    team = matches[1]
+    repository = matches[2]
+  })
+
+  this.teamName = team
+  this.repositoryName = repository
 
   var bbCommand = function (bitbucketCommand, callback, projectFolder=true){
     var command = "BITBUCKET_KEY="+config.values.bb.key+" BITBUCKET_SECRET="+config.values.bb.secret+" "+binPath+" "+bitbucketCommand
@@ -174,6 +186,14 @@ var Bitbucket = function(projectPath){
       process.exit()
     }
     
+  }
+
+  this.getTeamName = function(){
+
+  }
+
+  this.getSubmoduleName = function(){
+
   }
 
   var checkError = function(err, stdout, stderr){

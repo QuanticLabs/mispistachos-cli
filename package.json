@@ -35,6 +35,7 @@
     "get-parameter-names": "^0.3.0",
     "jsonfile": "^2.4.0",
     "prompt-sync": "git://github.com/0x00A/prompt-sync.git#babc1da2b4e0dc20bc3884a595b3bfcad96711c2",
+    "regex": "^0.1.1",
     "semaphore": "^1.0.5",
     "sleep": "^5.0.0",
     "sync-exec": "^0.6.2",

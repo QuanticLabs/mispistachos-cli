@@ -1,11 +1,19 @@
 var BitbucketPipeline = require(__base+'utilities/bitbucket-pipelines.js')
+var Bitbucket = require(__base+'utilities/bitbucket.js')
 var Yaml = require(__base+'utilities/yaml.js')
 
 var run = function(teamId,repositoryId){
   
-  bitbucketPipeline = new BitbucketPipeline(teamId)
-  
 
+  var bitbucket = new Bitbucket(process.cwd())
+  if(!teamId){
+    teamId = bitbucket.teamName
+  }
+
+  if(!repositoryId){
+    repositoryId = bitbucket.repositoryName
+  }
+  bitbucketPipeline = new BitbucketPipeline(teamId)
   var configPath = process.cwd()+"/config/bitbucket.yml"
   var variablesHash = null
   var updateFunc = null
@@ -51,8 +59,9 @@ var run = function(teamId,repositoryId){
 var load= function(program){
   program
   .command('set')
-  .description('Update bitbucket pipelines variables from config/bitbucket.yml file')
+  .description('Update bitbucket pipelines variables from ./config/bitbucket.yml file')
   .action(function(){
+
     run(program.team, program.repository)
   })
 }
