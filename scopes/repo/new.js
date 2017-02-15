@@ -17,7 +17,7 @@ If you have not created it yet, you can do here:\n\
 
 
   if(!teamId || teamId.length === 0){
-    console.log("Team name empty")
+    console.log("Team name cannot be empty")
     process.exit()
   }
 
@@ -25,12 +25,13 @@ If you have not created it yet, you can do here:\n\
   var bitbucket = new Bitbucket(projectPath); 
   var bitbucketPipeline = null
   if(!bitbucket.touchTeam(teamId)){
-    console.log("Team doesn't exists")  
+    console.log("Team doesn't exist")  
     process.exit()
-   }else{
+  }
+  else{
     bitbucketPipeline = new BitbucketPipeline(teamId); 
     console.log("Team fetched from bitbucket")  
-   }
+  }
 
   if (bitbucket.cloneDefaultInit(projectName)){
     bitbucket.addRemote("defaultinit", config.values.cli.defaultInit)

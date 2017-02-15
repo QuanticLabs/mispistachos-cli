@@ -46,18 +46,22 @@ var Bitbucket = function(projectPath){
   }
 
   this.cloneDefaultInit = function(){
-    if(!!projectPath){
+    if(!config.values.cli.defaultInit){
+      console.log("There's no Base Repo seleted. Please type one on bitbucket.")
+      var defaultInit = prompt.input("Base Repo: ")
+      config.values.cli.defaultInit = defaultInit
+    }
+    if(!!projectPath&&!!config.values.cli.defaultInit){
       if(!fileUtils.exists(projectPath)){
         console.log("Cloning project")
-        cmd.sync("git clone "+config.values.cli.defaultInit+" "+projectPath, nothing)
+        cmd.sync("git clone "+config.values.cli.defaultInit+" "+projectPath, print)
         console.log("Project clone finished")
         return true
-      }else{
-        console.log("ERROR: Folder '"+projectPath+"' exists")
       }
-      
+      else{
+        console.log("ERROR: Folder '"+projectPath+"' already exists")
+      }
     }
-
     return false
   }
 
@@ -89,18 +93,14 @@ var Bitbucket = function(projectPath){
 
   this.createRemoteRepository= function(projectTeamId, repositoryName){
     var created = false
-    bbCommand("create-repository -p "+projectTeamId+" "+repositoryName,function(err, stdout, stderr){
-      // console.log('TEST')
-      // print(err,stdout,stderr)
-      if(stdout.indexOf("Error: ") > -1){
+    bbCommand("create-repository -p "+projectTeamId+" "+repositoryName,function(err, stdout, stderr, status){
+      if(stdout.indexOf("Error: ") > -1 && status!=0){
+        print(err, stdout, stderr)
         created = false
       }else{
         created = true
       }
-
-      print(err, stdout, stderr)
     })
-
     return created
   }
 
@@ -142,8 +142,8 @@ var Bitbucket = function(projectPath){
   this.getSubmoduleNames = function(){
     console.log("Fetching submodules")
     var submodules = []
-    cmdInProjectPath("git config --file .gitmodules --get-regexp path | awk '{ print $2 }'", function(err, stdout, stderr){
-      if(checkError(err,stdout,stderr)){
+    cmdInProjectPath("git config --file .gitmodules --get-regexp path | awk '{ print $2 }'", function(err, stdout, stderr, status){
+      if(checkError(err,stdout,stderr, status)){
         print("Error fetching submodules")
       }
       submodules = stdout.split("\n")
@@ -198,30 +198,27 @@ var Bitbucket = function(projectPath){
 
   }
 
-  var checkError = function(err, stdout, stderr){
-    if(stdout.indexOf("Error: ") > -1 || !!err || !!stderr){
+  var checkError = function(err, stdout, stderr, status){
+    if(stdout.indexOf("Error: ") > -1 && !!err && !!stderr && status!=0){
       return true
     }
     return false
   }
 
-  var print = function(err, stdout, stderr){
-    if(!!err){
-      // console.log("err");
+  var print = function(err, stdout, stderr, status){
+    if(!!err&&status!=0){
       console.log(err);
     }
     if(!!stdout){
-      // console.log("stdout");
       console.log(stdout);
     }
     if(!!stderr){
-      // console.log("stderr");
       console.log(stderr);
     }
   }
 
   var nothing =function(err, stdout, stderr){
-    
+    // do nothing
   }
 
   var checkInput = function(input){
