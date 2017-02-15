@@ -125,19 +125,23 @@ var BitbucketPipeline = function(teamId){
     var responseTxt = response.body.toString('utf8')
     var responseJson =JSON.parse(responseTxt) 
     // console.log(responseJson)  
-    var variablesJson = responseJson.values
-    if(print)
-      console.log("KEY\tVALUE")
-    for(var i =0; i<variablesJson.length; i++){
-      var variableJson = variablesJson[i]
-      var variable = new Variable(variableJson.key, variableJson.uuid, variableJson.value)
-
-      if(print)
-        console.log(variable.key+":\t"+variable.value)
-      variables.push(variable)
-      variablesHash[variableJson.key] = variable
+    if(!!responseJson.type&&responseJson.type=="error"){
+      console.log("BitBucket error: "+responseJson.error.message)
     }
+    else{
+      var variablesJson = responseJson.values
+      if(print)
+        console.log("KEY\t\t\tVALUE")
+      for(var i =0; i<variablesJson.length; i++){
+        var variableJson = variablesJson[i]
+        var variable = new Variable(variableJson.key, variableJson.uuid, variableJson.value)
 
+        if(print)
+          console.log(variable.key+":\t"+(variable.key.length<15 ? "\t" : "")+variable.value)
+        variables.push(variable)
+        variablesHash[variableJson.key] = variable
+      }
+    }
     return variablesHash
   }
 

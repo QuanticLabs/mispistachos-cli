@@ -114,13 +114,13 @@ var GCloud = function(){
     cmd.sync("gcloud config get-value project", print)
   }
 
-  var print = function(err, stdout, stderr){
-    if(!!err)
+  var print = function(err, stdout, stderr, status){
+    if(!!err&&status!=0)
       console.log(err);
-    if(!!stdout)
-      console.log(stdout);
     if(!!stderr)
       console.log(stderr);
+    if(!!stdout)
+      console.log(stdout);
   }
 }
 

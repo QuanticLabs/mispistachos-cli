@@ -1,7 +1,6 @@
 var BitbucketPipeline = require(__base+'utilities/bitbucket-pipelines.js')
 
 var run = function(teamId,repositoryId){
-  
   bitbucketPipeline = new BitbucketPipeline(teamId)
   if(!!teamId && !!repositoryId)
     bitbucketPipeline.getRepositoryConfigVariables(repositoryId) 

@@ -28,8 +28,10 @@ var Bitbucket = function(projectPath){
 
   cmdInProjectPath("git remote -v", function(err, stdout, stderr){
     var matches = stdout.match(/origin.+git@.+:(.+)\/(.+)\./i)
-    team = matches[1]
-    repository = matches[2]
+    if(matches!=null){
+      team = matches[1]
+      repository = matches[2]
+    }
   })
 
   this.teamName = team
