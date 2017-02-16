@@ -124,9 +124,10 @@ var Bitbucket = function(projectPath){
   this.pushSubmodule = function(submoduleName){
     console.log("Pushing submodule '"+submoduleName+"' to a new repository")
     cmdInProjectPath("cd "+submoduleName+" && \
+      git checkout master && \
+      git remote add init $(git remote get-url --push origin) && \
       git add --all && \
       git commit -m 'first commit'",print)
-
     cmdInProjectPath("cd "+submoduleName+" && \
       git push origin master",print)
   }
@@ -135,7 +136,6 @@ var Bitbucket = function(projectPath){
     console.log("Pushing project to the new repository")
     cmdInProjectPath("git add --all && \
       git commit -m 'first commit'",print)
-
     cmdInProjectPath("git push origin master",print)
   }
 
