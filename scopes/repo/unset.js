@@ -30,5 +30,16 @@ var load= function(program){
   .action(function(key){
     run(program.team, program.repository, key)
   })
+  .on('--help', function(){
+    console.log("    Check 'mp r -h' for global options")
+    console.log('');
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ mp unset key                          # Unset variable "key" for current repo in current team');
+    console.log('    $ mp unset key -t                       # Unset variable "key" for current team');
+    console.log('    $ mp unset key -t teamName              # Unset variable "key" for team "teamName" ');
+    console.log('    $ mp unset key -t teamName -r repoName  # Unset variable "key" for repo "repoName" in team "teamName" ');
+    console.log('');
+  });
 }
 module.exports = load

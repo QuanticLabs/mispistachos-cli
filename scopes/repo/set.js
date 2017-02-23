@@ -41,5 +41,16 @@ var load= function(program){
 
     run(program.team, program.repository)
   })
+  .on('--help', function(){
+    console.log("    Check 'mp r -h' for global options")
+    console.log('');
+    console.log('  Examples:');
+    console.log('');
+    console.log('    $ mp set                         # Set env variables for current team-repo');
+    console.log('    $ mp set -t                      # Set env variables for current team');
+    console.log('    $ mp set -t teamName             # Set env variables for team "teamName" ');
+    console.log('    $ mp set -t teamName -r repoName # Set env variables for repo "repoName" in team "teamName" ');
+    console.log('');
+  });
 }
 module.exports = load
