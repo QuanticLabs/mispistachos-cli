@@ -1,37 +1,20 @@
 var BitbucketPipeline = require(__base+'utilities/bitbucket-pipelines.js')
 var Bitbucket = require(__base+'utilities/bitbucket.js')
 var Yaml = require(__base+'utilities/yaml.js')
+var utils = require('./utils.js')
 
-var run = function(teamId,repositoryId){
+var run = function(userTeamFlagValue,userRepoFlagValue){
+
+  var teamId = utils.getTeam(userTeamFlagValue)
+  var repoId = utils.getRepo(userTeamFlagValue,userRepoFlagValue)
   
-
-  var bitbucket = new Bitbucket(process.cwd())
-  if(!teamId){
-    teamId = bitbucket.teamName
-    if(!repositoryId){
-      repositoryId = bitbucket.repositoryName
-    }
-  }
-
-  
-  bitbucketPipeline = new BitbucketPipeline(teamId)
+  bitbucketPipeline = new BitbucketPipeline(teamId, repoId)
   var configPath = process.cwd()+"/config/bitbucket.yml"
-  var variablesHash = null
-  var updateFunc = null
-  if(!!teamId && !!repositoryId){
-    // bitbucketPipeline.getRepositoryConfigVariables(repositoryId) 
-    console.log("Updating environment variables to repo "+teamId+"/"+repositoryId)
-    
-    variablesHash = bitbucketPipeline.getRepositoryConfigVariables(repositoryId,false)
-    updateFunc = bitbucketPipeline.setRepositoryConfigVariable
-    
-  }
-  else if(!!teamId && !repositoryId){
-    console.log("Updating environment variables to team "+teamId)
-    variablesHash = bitbucketPipeline.getTeamConfigVariables(false)
-    updateFunc = bitbucketPipeline.setTeamConfigVariable
-  }
-  else{
+  var remoteVariablesHash = null
+
+  console.log("Updating environment variables to "+bitbucketPipeline.getTeamRepoString())
+  remoteVariablesHash = bitbucketPipeline.getConfigVariables(false)
+  if(!teamId){
     console.log("You must set one team and/or one respository")
     return
   }
@@ -41,20 +24,13 @@ var run = function(teamId,repositoryId){
   console.log("\nVariables to set:")
   yaml.print()
   console.log("")
-  var variables = yaml.values
+  var fileVariables = yaml.values
 
-  var keys = Object.keys(variables)
+  var keys = Object.keys(fileVariables)
   for(var i = 0 ; i< keys.length ; i++){
     var key = keys[i]
-    if(!!repositoryId)
-      updateFunc(repositoryId,key,variables[key],variablesHash)      
-    else
-      updateFunc(key,variables[key],variablesHash)      
-
+    bitbucketPipeline.setConfigVariable(key,fileVariables[key],remoteVariablesHash)
   }
-
-
-
 }
 
 var load= function(program){

@@ -23,13 +23,12 @@ If you have not created it yet, you can do here:\n\
 
   var projectPath = userPath + "/" + projectName
   var bitbucket = new Bitbucket(projectPath); 
-  var bitbucketPipeline = null
+  
   if(!bitbucket.touchTeam(teamId)){
     console.log("Team doesn't exist")  
     process.exit()
   }
   else{
-    bitbucketPipeline = new BitbucketPipeline(teamId); 
     console.log("Team fetched from bitbucket")  
   }
 
@@ -58,7 +57,9 @@ If you have not created it yet, you can do here:\n\
       for(var i = 0; i< submoduleNames.length; i++){
         var submoduleName = submoduleNames[i]
         bitbucket.pushSubmodule(submoduleName)
-        bitbucketPipeline.enablePipelinesForRepository(submoduleName)
+        var bitbucketPipeline = new BitbucketPipeline(teamId, submoduleName); 
+
+        bitbucketPipeline.enablePipelinesForRepository()
       }
 
       bitbucket.pushProject()
