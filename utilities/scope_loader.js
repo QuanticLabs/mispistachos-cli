@@ -30,7 +30,7 @@ var _getProgram = function(scopeFolder){
   var files = fileUtils.getFiles(folderPath)
   for (var i = 0; i < files.length; i++){
     var fileName = files[i]
-    if(fileName !== "loader.js"){
+    if(fileName !== "loader.js" && fileName !== "utils.js"){
       var load = require(folderPath+"/"+fileName)
       load(subProgram)
     }

@@ -161,7 +161,7 @@ var BitbucketPipeline = function(teamId){
 
   this.getRepositoryConfigVariables = function(repositoryId,print=true){
     var url = "repositories/"+teamId+"/"+repositoryId+"/pipelines_config/variables/"
-    console.log("Pipelines variables for repo "+teamId+"/"+repositoryId+":")
+    console.log("Pipelines variables for team "+teamId+", repo "+repositoryId+":")
     return getConfigVariable(url,print)
 
   }
