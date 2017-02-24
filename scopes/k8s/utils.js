@@ -1,22 +1,12 @@
 
 var gcloud = require(__base+'utilities/gcloud.js')
 var Bitbucket = new require(__base+'utilities/bitbucket.js')
+var k8s = new require(__base+'utilities/k8s.js')
 var bitbucket = new Bitbucket(process.cwd())
 
 var Utils = function(){
 
-  // this.getProject = function(userProjectFlagValue){
-  //   //Default: Current gcloud Project 
-  //   var projectName = null
-  //   if(!!userProjectFlagValue && userProjectFlagValue !== true){
-  //     projectName = userProjectFlagValue
-  //   }else{
-  //     projectName = gcloud.getCurrentProject();
-  //   }
-
-  //   return projectName
-  // }
-
+  
   this.getContainer = function(userContainerFlagValue){
     var containerName = null
 
@@ -40,6 +30,52 @@ var Utils = function(){
     return deploymentName
   }
 
+  this.getPod = function(containerName, deploymentName){
+
+    var podNames = k8s.getPodNames(containerName, deploymentName)
+  
+    if(podNames.length == 0){
+      console.log("Pod not found")
+      process.exit()
+    }
+
+    var podName = null
+    if(podNames.length == 1){
+      podName = podNames[0]
+    }else{
+      var webPodNames = podNames.filter(function(p){ return p.includes("web-")})
+      if(webPodNames.length > 0){
+        podName = webPodNames[0]
+      }else{
+        podName = podNames[0]
+      }
+    }
+
+    if(!podName){
+      console.log("Pod not found")
+      process.exit()
+    }
+
+    console.log("Pod '"+podName+"' found") 
+    return podName
+  }
+
+  this.refactorCommand = function(command){
+    command = command.trim()
+    var commands = command.split(" ")
+    commands = commands.filter(function(c){ return !!c})
+    var refactoredCommand = ["bundle", "exec"]
+
+    for (var i = 0; i < commands.length; i++){
+      var name = commands[i]
+      if(name !== "bundle" && name !== "exec"){
+        refactoredCommand.push(name)
+      }
+    }
+
+    return refactoredCommand.join(" ")
+
+  }
 }
 
 

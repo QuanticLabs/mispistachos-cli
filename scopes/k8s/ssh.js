@@ -9,34 +9,7 @@ var run = function(userContainerFlagValue, userDeploymentFlagValue){
 
   console.log("Searching pod for container '"+containerName+"'")
 
-  var podNames = k8s.getPodNames(containerName, deploymentName)
-  
-  if(podNames.length == 0){
-    console.log("Pod not found")
-    process.exit()
-  }
-
-  var podName = null
-
-
-
-  if(podNames.length == 1){
-    podName = podNames[0]
-  }else{
-    var webPodNames = podNames.filter(function(p){ return p.includes("web-")})
-    if(webPodNames.length > 0){
-      podName = webPodNames[0]
-    }else{
-      podName = podNames[0]
-    }
-  }
-
-  if(!podName){
-    console.log("Pod not found")
-    process.exit()
-  }
-
-  console.log("Pod '"+podName+"' found") 
+  var podName = utils.getPod(containerName, deploymentName)
 
   var fullCommand = "kubectl exec -it "+podName+" -c "+containerName+" bash"
   console.log("Executing command:")
@@ -46,16 +19,6 @@ var run = function(userContainerFlagValue, userDeploymentFlagValue){
 
   var spawn = require('child_process').spawn;
   var child = spawn('kubectl', ['exec', '-it', podName, '-c', containerName, 'bash'], {stdio: [0, 1, 2]});
-
-  // child.stdout.on('data', function(chunk) {
-  //   console.log(chunk)
-  // });
-
-  // or if you want to send output elsewhere
-  // child.stdout.pipe(dest);
-  // child.stdout.pipe(process.stdout);
-  // child.stderr.pipe(process.stderr);
-
 
 }
 
