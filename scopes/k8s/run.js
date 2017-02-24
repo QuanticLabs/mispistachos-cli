@@ -44,9 +44,9 @@ var load= function(program){
     console.log('');
     console.log('  Examples:');
     console.log('');
-    console.log('    $ mp k run rake db:migrate                                # Run the command in (current project, any deployment, container "repoName")');
+    console.log('    $ mp k run rake db:migrate                                # Run the command in (current project, any deployment         , container "repoName")');
     console.log('    $ mp k run rails c -d deployName                          # Run the command in (current project, deployment "deployName", container "repoName")');
-    console.log('    $ mp k run rake db:create -c containerName                # Run the command in (current project, any deployment, container "containerName")');
+    console.log('    $ mp k run rake db:create -c containerName                # Run the command in (current project, any deployment         , container "containerName")');
     console.log('    $ mp k run bundle install -d deployName -c containerName  # Run the command in (current project, deployment "deployName", container "containerName")');
     console.log('')
     console.log('    To change the current project, look:')
