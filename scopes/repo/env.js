@@ -29,10 +29,10 @@ var load= function(program){
     console.log('');
     console.log('  Examples:');
     console.log('');
-    console.log('    $ mp env                         # Show env variables for current team-repo');
-    console.log('    $ mp env -t                      # Show env variables for current team');
-    console.log('    $ mp env -t teamName             # Show env variables for team "teamName" ');
-    console.log('    $ mp env -t teamName -r repoName # Show env variables for repo "repoName" in team "teamName" ');
+    console.log('    $ mp r env                         # Show env variables for current team-repo');
+    console.log('    $ mp r env -t                      # Show env variables for current team');
+    console.log('    $ mp r env -t teamName             # Show env variables for team "teamName" ');
+    console.log('    $ mp r env -t teamName -r repoName # Show env variables for repo "repoName" in team "teamName" ');
     console.log('');
   });
 }

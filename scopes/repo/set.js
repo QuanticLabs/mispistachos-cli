@@ -46,10 +46,10 @@ var load= function(program){
     console.log('');
     console.log('  Examples:');
     console.log('');
-    console.log('    $ mp set                         # Set env variables for current team-repo');
-    console.log('    $ mp set -t                      # Set env variables for current team');
-    console.log('    $ mp set -t teamName             # Set env variables for team "teamName" ');
-    console.log('    $ mp set -t teamName -r repoName # Set env variables for repo "repoName" in team "teamName" ');
+    console.log('    $ mp r set                         # Set env variables for current team-repo');
+    console.log('    $ mp r set -t                      # Set env variables for current team');
+    console.log('    $ mp r set -t teamName             # Set env variables for team "teamName" ');
+    console.log('    $ mp r set -t teamName -r repoName # Set env variables for repo "repoName" in team "teamName" ');
     console.log('');
   });
 }

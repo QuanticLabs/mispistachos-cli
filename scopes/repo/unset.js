@@ -35,10 +35,10 @@ var load= function(program){
     console.log('');
     console.log('  Examples:');
     console.log('');
-    console.log('    $ mp unset key                          # Unset variable "key" for current repo in current team');
-    console.log('    $ mp unset key -t                       # Unset variable "key" for current team');
-    console.log('    $ mp unset key -t teamName              # Unset variable "key" for team "teamName" ');
-    console.log('    $ mp unset key -t teamName -r repoName  # Unset variable "key" for repo "repoName" in team "teamName" ');
+    console.log('    $ mp r unset key                          # Unset variable "key" for current repo in current team');
+    console.log('    $ mp r unset key -t                       # Unset variable "key" for current team');
+    console.log('    $ mp r unset key -t teamName              # Unset variable "key" for team "teamName" ');
+    console.log('    $ mp r unset key -t teamName -r repoName  # Unset variable "key" for repo "repoName" in team "teamName" ');
     console.log('');
   });
 }

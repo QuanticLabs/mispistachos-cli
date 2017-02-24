@@ -1,5 +1,5 @@
 
-var gcloud = require(__base+'utilities/gcloud.js')
+var gcloud = require('../../utilities/gcloud.js')
 
 var run = function(){
   gcloud.listProjects();
