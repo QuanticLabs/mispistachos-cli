@@ -7,7 +7,7 @@ var _alias = "k"
 var _name = "k8s"
 
 var _options = [
-  new scope.Option("p", "project",   "Google project ID. Current by default"),
+  new scope.Option("d", "deployment", "Deployment name"),
   new scope.Option("c", "container", "Container name. Current repository name by default")
 ] 
 

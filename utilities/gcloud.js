@@ -110,11 +110,7 @@ var GCloud = function(){
       }
   }
    
-  this.getCurrentProject = function(){
-    cmd.sync("gcloud config get-value project", print)
-  }
-
-  var print = function(err, stdout, stderr, status){
+   var print = function(err, stdout, stderr, status){
     if(!!err&&status!=0)
       console.log(err);
     if(!!stderr)
@@ -122,6 +118,17 @@ var GCloud = function(){
     if(!!stdout)
       console.log(stdout);
   }
+  this.getCurrentProject = function(print_ = true){
+    var projectName = null
+    cmd.sync("gcloud config get-value project", function(err, stdout, stderr, status){
+      if(print_)
+        print(err, stdout, stderr, status)
+      projectName = stdout
+    })
+    return projectName
+  }
+
+ 
 }
 
 module.exports = new GCloud()
