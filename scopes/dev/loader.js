@@ -7,7 +7,8 @@ var _alias = "dev"
 var _name = "development"
 
 var _options = [
-  new scope.Option("c", "container", "Container name. Current repository name by default")
+  new scope.Option("c", "container"    , "Container name. Current repository name by default"),
+  new scope.Option("n", "new", "Run commands in a new container")
 ] 
 
 module.exports = {
