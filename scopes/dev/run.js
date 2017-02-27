@@ -6,13 +6,13 @@ var run = function(command, userContainerFlagValue){
   var containerName = userUtils.getContainer(userContainerFlagValue)
   var command       = userUtils.refactorCommand(command)
 
-  var fullCommand = "docker-compose run --rm "+containerName+" "+command
+  var fullCommand = "docker-compose exec "+containerName+" "+command
   console.log("Executing command:")
   console.log("  " + fullCommand)
   console.log("")
   console.log("")
-  
-  var params = ['run', '--rm', containerName]
+
+  var params = ['run', containerName]
   params = params.concat(command.split(" "))
 
   cmd.execRemote("docker-compose", params)

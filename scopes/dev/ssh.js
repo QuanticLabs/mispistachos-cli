@@ -6,8 +6,13 @@ var run = function(command, userContainerFlagValue){
 
   var containerName = userUtils.getContainer(userContainerFlagValue)
 
-  var fullCommand = "docker-compose run --rm web bash"
-  var params = ['run', '--rm', "web", "bash"]
+  var fullCommand = "docker-compose exec web bash"
+  console.log("Executing command:")
+  console.log("  " + fullCommand)
+  console.log("")
+  console.log("")
+  
+  var params = ['exec', "web", "bash"]
 
   cmd.execRemote("docker-compose", params)
 }
