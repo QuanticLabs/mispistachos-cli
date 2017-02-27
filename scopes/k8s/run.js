@@ -1,17 +1,17 @@
-var utils = require('./utils.js')
 var k8s = require(__base+'utilities/k8s.js')
 var cmd = require(__base+'utilities/cmd.js')
+var userUtils = require(__base+'utilities/user.js')
 
 var run = function(command, userContainerFlagValue, userDeploymentFlagValue){
-  var containerName = utils.getContainer(userContainerFlagValue)
-  var deploymentName = utils.getDeployment(userDeploymentFlagValue)
+  var containerName = userUtils.getContainer(userContainerFlagValue)
+  var deploymentName = userUtils.getDeployment(userDeploymentFlagValue)
 
 
   console.log("Searching pod for container '"+containerName+"'")
 
-  var podName = utils.getPod(containerName, deploymentName)
+  var podName = userUtils.getPod(containerName, deploymentName)
 
-  var command = utils.refactorCommand(command)
+  var command = userUtils.refactorCommand(command)
 
   var fullCommand = "kubectl exec -it "+podName+" -c "+containerName+" "+command
   console.log("Executing command:")
@@ -19,19 +19,16 @@ var run = function(command, userContainerFlagValue, userDeploymentFlagValue){
   console.log("")
   console.log("")
 
-  var spawn = require('child_process').spawn;
-
   var params = ['exec', '-it', podName, '-c', containerName]
   params = params.concat(command.split(" "))
-
-  var child = spawn('kubectl', params, {stdio: [0, 1, 2]});
+  cmd.execRemote('kubectl', params)
 
 }
 
 var load= function(program){
   program
   .command('run <COMMAND> [PARAMS...]')
-  .description('Run "bundle exec .." commands in the container')
+  .description('Run "bundle exec .." commands in the remote container')
   .action(function(command, params){
 
     var ps = params || []

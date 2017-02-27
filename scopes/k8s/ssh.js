@@ -1,15 +1,15 @@
-var utils = require('./utils.js')
+var userUtils = require(__base+'utilities/user.js')
 var k8s = require(__base+'utilities/k8s.js')
 var cmd = require(__base+'utilities/cmd.js')
 
 var run = function(userContainerFlagValue, userDeploymentFlagValue){
-  var containerName = utils.getContainer(userContainerFlagValue)
-  var deploymentName = utils.getDeployment(userDeploymentFlagValue)
+  var containerName = userUtils.getContainer(userContainerFlagValue)
+  var deploymentName = userUtils.getDeployment(userDeploymentFlagValue)
 
 
   console.log("Searching pod for container '"+containerName+"'")
 
-  var podName = utils.getPod(containerName, deploymentName)
+  var podName = userUtils.getPod(containerName, deploymentName)
 
   var fullCommand = "kubectl exec -it "+podName+" -c "+containerName+" bash"
   console.log("Executing command:")
@@ -26,7 +26,7 @@ var load= function(program){
   program
   .command('ssh')
   .alias('bash')
-  .description('SSH to a specific container')
+  .description('SSH to a specific remote container')
   .action(function(){
     run(program.container, program.deployment)
   })
