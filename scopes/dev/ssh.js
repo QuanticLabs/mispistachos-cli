@@ -9,11 +9,11 @@ var run = function(userContainerFlagValue, newContainerFlagValue){
   var fullCommand = null
   var params = null
   if(!!newContainerFlagValue){
-    fullCommand = "docker-compose run --rm web bash"
-    params = ['run', '--rm', "web", "bash"]
+    fullCommand = "docker-compose run --rm "+containerName+" bash"
+    params = ['run', '--rm', containerName, "bash"]
   }else{
-    fullCommand = "docker-compose exec web bash"
-    params = ['exec', 'web', 'bash']
+    fullCommand = "docker-compose exec "+containerName+" bash"
+    params = ['exec', containerName, 'bash']
   }
   console.log("Executing command:")
   console.log("  " + fullCommand)
