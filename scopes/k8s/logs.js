@@ -1,3 +1,5 @@
+
+
 var userUtils = require(__base+'utilities/user.js')
 var k8s = require(__base+'utilities/k8s.js')
 var cmd = require(__base+'utilities/cmd.js')
@@ -11,23 +13,21 @@ var run = function(userContainerFlagValue, userDeploymentFlagValue){
 
   var podName = userUtils.getPod(containerName, deploymentName)
 
-  var fullCommand = "kubectl exec -it "+podName+" -c "+containerName+" bash"
+  var fullCommand = "kubectl exec -it "+podName+" -c "+containerName+" -- tail -f log/production.log"
   console.log("Executing command:")
   console.log("  " + fullCommand)
   console.log("")
   console.log("")
 
-  
-  var params = ['exec', '-it', podName, '-c', containerName, 'bash']
+  var params = ['exec', '-it', podName, '-c', containerName, '--', 'tail', '-f', 'log/production.log']
   cmd.execRemote('kubectl', params)
-
 }
 
 var load= function(program){
   program
-  .command('ssh')
-  .alias('bash')
-  .description('SSH to a specific remote container')
+  .command('logs')
+  .alias('log')
+  .description('Check logs for container')
   .action(function(){
     run(program.container, program.deployment)
   })
@@ -36,10 +36,7 @@ var load= function(program){
     console.log('');
     console.log('  Examples:');
     console.log('');
-    console.log('    $ mp k ssh                                       # SSH with container "repoName" in the current project');
-    console.log('    $ mp k ssh -d deployName                         # SSH with container "repoName", deployment "deployName" in the current project');
-    console.log('    $ mp k ssh -c containerName                      # SSH with container "containerName" in the current project');
-    console.log('    $ mp k ssh -d deployName -c containerName        # SSH with container "containerName", deployment "deployName" in the current project, container "containerName" in the current project');
+    console.log('    $ mp k logs                                       # SSH with container "repoName" in the current project');
     console.log('')
     console.log('    To change the current project, look:')
     console.log('      $ mp p set -h')
