@@ -39,7 +39,7 @@ var load= function(program){
     console.log('    $ mp k ssh                                       # SSH with container "repoName" in the current project');
     console.log('    $ mp k ssh -d deployName                         # SSH with container "repoName", deployment "deployName" in the current project');
     console.log('    $ mp k ssh -c containerName                      # SSH with container "containerName" in the current project');
-    console.log('    $ mp k ssh -d deployName -c containerName        # SSH with container "containerName", deployment "deployName" in the current project, container "containerName" in the current project');
+    console.log('    $ mp k ssh -d deployName -c containerName        # SSH with container "containerName", deployment "deployName" in the current project');
     console.log('')
     console.log('    To change the current project, look:')
     console.log('      $ mp p set -h')
