@@ -22,10 +22,12 @@ var K8S = function(){
       
       var lines = stdout.split("\n")
       
-      if(!!deploymentName)
-        lines = lines.filter(function(l){ return l.includes(containerName+":")&&l.includes(deploymentName+"-") })
-      else
-        lines = lines.filter(function(l){ return l.includes(containerName+":")})
+      if(!!deploymentName){
+        lines = lines.filter(function(l){ return l.includes(containerName+"")&&l.includes(deploymentName+"-") })
+
+      }else{
+        lines = lines.filter(function(l){ return l.includes(containerName+"")})
+      }
       
       podNames = lines.map(function(l){ return l.split(":")[0]})
     })

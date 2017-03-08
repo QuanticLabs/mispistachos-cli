@@ -47,15 +47,16 @@ var User = function(){
   }
 
   this.getPod = function(containerName, deploymentName){
-
     var podNames = k8s.getPodNames(containerName, deploymentName)
   
     if(podNames.length == 0){
-      console.log("Pod not found")
+      console.log("Pod not found (1)")
       process.exit()
     }
 
     var podName = null
+    console.log("podNames")
+    console.log(podNames)
     if(podNames.length == 1){
       podName = podNames[0]
     }else{
@@ -68,7 +69,7 @@ var User = function(){
     }
 
     if(!podName){
-      console.log("Pod not found")
+      console.log("Pod not found (2)")
       process.exit()
     }
 
