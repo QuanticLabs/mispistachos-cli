@@ -9,12 +9,15 @@ var run = function(userContainerFlagValue, newContainerFlagValue){
   var fullCommand = null
   var params = null
   if(!!newContainerFlagValue){
+    console.log('Creating a new container...')
     fullCommand = "docker-compose run --rm "+containerName+" bash"
     params = ['run', '--rm', containerName, "bash"]
   }else{
+    console.log('Searching an existent container...')
     fullCommand = "docker-compose exec "+containerName+" bash"
     params = ['exec', containerName, 'bash']
   }
+
   console.log("Executing command:")
   console.log("  " + fullCommand)
   console.log("")
