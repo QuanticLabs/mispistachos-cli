@@ -42,9 +42,9 @@ var load= function(program){
     console.log('');
     console.log('  Examples:');
     console.log('');
-    console.log('    $ mp dev ssh                                       # SSH with an existent container "repoName"');
-    console.log('    $ mp dev ssh -c containerName                      # SSH with an existent container "containerName"');
-    console.log('    $ mp dev ssh -c containerName -n                   # SSH with a new container "containerName"');
+    console.log('    $ mp dev ssh                                       # SSH in an existent container "repoName"');
+    console.log('    $ mp dev ssh -c containerName                      # SSH in an existent container "containerName"');
+    console.log('    $ mp dev ssh -c containerName -n                   # SSH in a new container "containerName"');
     console.log('')
     console.log('    To change the current project, look:')
     console.log('      $ mp p set -h')
