@@ -6,7 +6,7 @@ var Cmd = function(){
   //callback: function(err, stdout, stderr){}
 
   // https://www.npmjs.com/package/executive
-  this.simpleExec = function(command, options = {}, callback){
+  this.simpleExec = function(command, options = {}, callback, stdout){
     exec.quiet(command, options, callback)
   }
 
