@@ -6,8 +6,7 @@ var _alias = "pg"
 var _name  = "postgres"
 
 var _options = [
-  new scope.Option("d", "deployment", "Deployment name"),
-  new scope.Option("c", "container", "Container name. Current repository name by default")
+  new scope.Option("s", "skipBackup", "Do not make a new backup and use the last one.")
 ] 
 
 module.exports = {

@@ -30,7 +30,6 @@ var load= function(program){
   .command('run <COMMAND> [PARAMS...]')
   .description('Run any command in the remote container')
   .action(function(command, params){
-
     var ps = params || []
     ps.unshift(command)
     var fullCommand = ps.join(" ")

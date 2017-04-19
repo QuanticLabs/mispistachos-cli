@@ -35,7 +35,6 @@ var load= function(program){
   .description('SSH to a specific local container')
   .action(function(){
     run(program.container, program.new)
-
   })
   .on('--help', function(){
     console.log("    Check 'mp dev -h' for global options")

@@ -19,7 +19,7 @@ var checkIfContainerRunning = function(containerName){
   return ret
 }
 
-var run = function(){
+var run = function(skipBackupFlagValue){
   var postgresContainerName = userUtils.getContainer("postgres")
   var cronContainerName = userUtils.getContainer("cron")
   var webContainerName = userUtils.getContainer("web")
@@ -56,31 +56,35 @@ var run = function(){
 
   console.log("");
 
-  console.log("Searching pod for container '"+cronContainerName+"'")
-
-  var podName = userUtils.getPod(cronContainerName, deploymentName)
-
-  var remoteDumpAndBackupCommand = "kubectl exec -it "+podName+" -c "+cronContainerName+" /commands/dump_db_and_backup.sh"
-  console.log("Executing command:")
-  console.log("  " + remoteDumpAndBackupCommand)
-  console.log("")
-  console.log("")
-
-  backupDone = true;
-  cmd.sync(remoteDumpAndBackupCommand, function(err, stdout, stderr){
-    console.log(stdout);
-    if(stdout.indexOf("error has occurred.") > -1){
-      backupDone = false;
-    }
-  })
-
-  if(backupDone === false){
-    console.log("Error creating database backup ");
-    process.exit();
+  if(!!skipBackupFlagValue){
+    console.log("Skipping the creation of a new backup.")
+    console.log("");
   }
+  else{
+    console.log("Searching pod for container '"+cronContainerName+"'")
+    var podName = userUtils.getPod(cronContainerName, deploymentName)
+    var remoteDumpAndBackupCommand = "kubectl exec -it "+podName+" -c "+cronContainerName+" /commands/dump_db_and_backup.sh"
+    console.log("Executing command:")
+    console.log("  " + remoteDumpAndBackupCommand)
+    console.log("")
+    console.log("")
 
-  console.log("Database backup ready");
-  console.log("");
+    backupDone = true;
+    cmd.sync(remoteDumpAndBackupCommand, function(err, stdout, stderr){
+      console.log(stdout);
+      if(stdout.indexOf("error has occurred.") > -1){
+        backupDone = false;
+      }
+    })
+
+    if(backupDone === false){
+      console.log("Error creating database backup ");
+      process.exit();
+    }
+
+    console.log("Database backup ready");
+    console.log("");
+  }
 
   console.log("Recreating the development database");
   var databaseRereated = true;
@@ -148,7 +152,7 @@ var load = function(program){
   .command('pull')
   .description('Copy kubernetes database into a local postgres container')
   .action(function(command, params){
-    run()
+    run(program.skipBackup)
   })
   .on('--help', function(){
     console.log("    Check 'mp pg -h' for global options")
@@ -156,6 +160,7 @@ var load = function(program){
     console.log('  Examples:');
     console.log('');
     console.log('    $ mp pg pull');
+    console.log('    $ mp pg pull -nb');
     console.log('')
     console.log('    To change the current project, look:')
     console.log('      $ mp p set -h')
