@@ -125,7 +125,7 @@ var GCloud = function(){
         print(err, stdout, stderr, status)
       projectName = stdout
     })
-    return projectName
+    return projectName.replace('\n','').replace('\r','');
   }
 
  

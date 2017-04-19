@@ -110,7 +110,7 @@ var run = function(){
     process.exit();
   }
 
-  currentProject = gcloud.getCurrentProject().replace('\n','').replace('\r','');
+  currentProject = gcloud.getCurrentProject();
   console.log("The following variable should be equal to the CURRENT_PROJECT environment variable on k8s. You can check it with 'kubectl proxy' and checking the secrets.");
   console.log("currentProject: ",currentProject)
 
