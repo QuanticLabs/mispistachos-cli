@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-
 var scope = require(__base+"utilities/scope.js")
 var _description = 'Manage remote databases'
 var _alias = "pg"

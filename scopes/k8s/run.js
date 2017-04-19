@@ -28,7 +28,7 @@ var run = function(command, userContainerFlagValue, userDeploymentFlagValue){
 var load= function(program){
   program
   .command('run <COMMAND> [PARAMS...]')
-  .description('Run "bundle exec .." commands in the remote container')
+  .description('Run any command in the remote container')
   .action(function(command, params){
 
     var ps = params || []

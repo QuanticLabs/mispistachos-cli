@@ -10,15 +10,18 @@ var User = function(){
     command = command.trim()
     var commands = command.split(" ")
     commands = commands.filter(function(c){ return !!c})
-    var refactoredCommand = ["bundle", "exec"]
-
-    for (var i = 0; i < commands.length; i++){
-      var name = commands[i]
-      if(name !== "bundle" && name !== "exec"){
-        refactoredCommand.push(name)
-      }
-    }
-    return refactoredCommand.join(" ")
+    
+    //TODO: It could be dependent of the web container
+    // var refactoredCommand = ["bundle", "exec"]
+    // for (var i = 0; i < commands.length; i++){
+    //   var name = commands[i]
+    //   if(name !== "bundle" && name !== "exec"){
+    //     refactoredCommand.push(name)
+    //   }
+    // }
+    // return refactoredCommand.join(" ")
+    
+    return commands.join(" ")
   }
 
   this.getContainer = function(userContainerFlagValue){

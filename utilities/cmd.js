@@ -19,14 +19,10 @@ var Cmd = function(){
     this.simpleExec(command, {sync: false}, callback)
   }
 
-
   this.execRemote = function(executableFile, params){
     var spawn = require('child_process').spawn;
-
     var child = spawn(executableFile, params, {stdio: [0, 1, 2]});
   }
-
-
 
 }
 

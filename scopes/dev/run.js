@@ -31,7 +31,7 @@ var run = function(command, userContainerFlagValue, newContainerFlagValue){
 var load= function(program){
   program
   .command('run <COMMAND> [PARAMS...]')
-  .description('Run "bundle exec .." commands in the local container')
+  .description('Run any command in the local container')
   .action(function(command, params){
     var ps = params || []
     ps.unshift(command)

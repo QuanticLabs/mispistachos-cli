@@ -3,18 +3,15 @@ var utils = require('./utils.js')
 
 
 var run = function(userTeamFlagValue,userRepoFlagValue){
-
   var teamId = utils.getTeam(userTeamFlagValue)
   var repoId = utils.getRepo(userTeamFlagValue,userRepoFlagValue)
 
   console.log("Target team: "+teamId)
   console.log("Target repo: "+repoId)
 
-
   var bitbucketPipeline = new BitbucketPipeline(teamId, repoId)
 
   bitbucketPipeline.getConfigVariables() 
-  
 }
 
 var load= function(program){
