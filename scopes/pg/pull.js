@@ -5,7 +5,7 @@ var gcloud = require(__base+'utilities/gcloud.js')
 var Yaml = require(__base+'utilities/yaml.js')
 
 var checkIfContainerRunning = function(containerName){
-  var command = "docker ps | grep '"+containerName+"'" 
+  var command = "docker ps | grep '"+containerName+"'"
   var ret = false;
   cmd.sync(command, function(err,stdout,stderr){
     // console.log(stdout)
@@ -160,7 +160,7 @@ var load = function(program){
     console.log('  Examples:');
     console.log('');
     console.log('    $ mp pg pull');
-    console.log('    $ mp pg pull -nb');
+    console.log('    $ mp pg pull -s');
     console.log('')
     console.log('    To change the current project, look:')
     console.log('      $ mp p set -h')
