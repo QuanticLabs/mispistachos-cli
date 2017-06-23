@@ -12,14 +12,19 @@ var User = function(){
     commands = commands.filter(function(c){ return !!c})
     
     //TODO: It could be dependent of the web container
-    // var refactoredCommand = ["bundle", "exec"]
-    // for (var i = 0; i < commands.length; i++){
-    //   var name = commands[i]
-    //   if(name !== "bundle" && name !== "exec"){
-    //     refactoredCommand.push(name)
-    //   }
-    // }
-    // return refactoredCommand.join(" ")
+    var refactoredCommand = ["bundle", "exec"]
+
+    if(commands.length > 0 && commands[0].startsWith("rails") || commands[0].startsWith("rake")){
+      for (var i = 0; i < commands.length; i++){
+        var name = commands[i]
+        if(name !== "bundle" && name !== "exec"){
+          refactoredCommand.push(name)
+        }
+      }
+      return refactoredCommand.join(" ")
+    }
+
+    
     
     return commands.join(" ")
   }
