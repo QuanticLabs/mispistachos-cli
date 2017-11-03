@@ -15,13 +15,17 @@ var K8S = function(){
 
   this.getPodNames = function(containerName, deploymentName){
     var podNames = []
-    var fullCommand = "kubectl get pods -o=jsonpath='{range .items[*]}{\"\\n\"}{.metadata.name}{\":\\t\"}{range .spec.containers[*]}{.image}{\", \"}{end}{end}' | sort"
+    var fullCommand = "kubectl get pods --output=jsonpath={.items..metadata.name}"
+    // var fullCommand = "kubectl get pods -o=jsonpath='{range .items[*]}{\"\\n\"}{.metadata.name}{\":\\t\"}{range .spec.containers[*]}{.image}{\", \"}{end}{end}' | sort"
+    
     console.log("Executing:")
     console.log("  "+fullCommand)
     cmd.sync(fullCommand, function(err, stdout, stderr){
+      // console.log(`err: ${err} stdout: ${stdout} stderr: ${stderr}`)
       
-      var lines = stdout.split("\n")
-      
+      var lines = stdout.split(" ")
+      console.log('Pods Found: ')
+      console.log(lines)
       if(!!deploymentName){
         lines = lines.filter(function(l){ return l.includes(containerName+"")&&l.includes(deploymentName+"-") })
 

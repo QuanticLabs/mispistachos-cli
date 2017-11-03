@@ -5,13 +5,19 @@ var gcloud = require(__base+'utilities/gcloud.js')
 var Yaml = require(__base+'utilities/yaml.js')
 
 var checkIfContainerRunning = function(containerName){
-  var command = "docker ps | grep '"+containerName+"'"
+  var command = "docker ps -f \"name=" + containerName + "\""
+  console.log("Executing:");
+  console.log(command);
   var ret = false;
   cmd.sync(command, function(err,stdout,stderr){
-    // console.log(stdout)
-    var runningContainers = stdout.split("\n").length - 1
+    console.log(stdout)
+    // console.log(err)
+    // console.log(stderr)
+    var output = stdout.trim();
+    var runningContainers = 0;
+    runningContainers = output.split("\n").length - 1;
     console.log("Running containers: "+runningContainers)
-    if(runningContainers > 0){
+    if(output.length > 0 && runningContainers > 0){
       ret = true;
     }
   });
