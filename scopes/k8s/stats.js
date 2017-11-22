@@ -1,9 +1,9 @@
 
 
 var userUtils = require(__base+'utilities/user.js')
-var k8s = require(__base+'utilities/k8s.js')
 var cmd = require(__base+'utilities/cmd.js')
 const opn = require('opn');
+
 var run = function(){
 
   //kubectl port-forward -n kube-system monitoring-grafana-3552275057-0splp 3010:3000
