@@ -6,6 +6,8 @@ var run = function(resource, namespace){
   //kubectl port-forward -n kube-system monitoring-grafana-3552275057-0splp 3010:3000
 
   
+  if(!resource)
+    resource = "pods"
 
 
   var fullCommand;
