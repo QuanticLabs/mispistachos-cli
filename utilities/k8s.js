@@ -13,9 +13,12 @@ var K8S = function(){
     return pods
   }
 
-  this.getPodNames = function(containerName, deploymentName){
+  this.getPodNames = function(containerName, deploymentName, namespace){
+    if (!namespace)
+      namespace = "default"
+
     var podNames = []
-    var fullCommand = "kubectl get pods --output=jsonpath={.items..metadata.name}"
+    var fullCommand = "kubectl get pods -n "+namespace+" --output=jsonpath={.items..metadata.name}"
     // var fullCommand = "kubectl get pods -o=jsonpath='{range .items[*]}{\"\\n\"}{.metadata.name}{\":\\t\"}{range .spec.containers[*]}{.image}{\", \"}{end}{end}' | sort"
     
     console.log("Executing:")

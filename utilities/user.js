@@ -54,8 +54,9 @@ var User = function(){
     return deploymentName
   }
 
-  this.getPod = function(containerName, deploymentName){
-    var podNames = k8s.getPodNames(containerName, deploymentName)
+  this.getPod = function(containerName, deploymentName, namespace){
+    var podNames = k8s.getPodNames(containerName, deploymentName, namespace)
+
   
     if(podNames.length == 0){
       console.log("Pod not found (1)")

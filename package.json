@@ -34,6 +34,7 @@
     "executive": "^1.1.7",
     "get-parameter-names": "^0.3.0",
     "jsonfile": "^2.4.0",
+    "opn": "^5.1.0",
     "prompt-sync": "git://github.com/0x00A/prompt-sync.git#babc1da2b4e0dc20bc3884a595b3bfcad96711c2",
     "regex": "^0.1.1",
     "semaphore": "^1.0.5",
