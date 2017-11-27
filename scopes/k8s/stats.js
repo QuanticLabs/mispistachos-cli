@@ -27,7 +27,6 @@ var run = function(){
 var load= function(program){
   program
   .command('stats')
-  .alias('stats')
   .description('Open Grafana for check cluster usage')
   .action(function(){
     run()
