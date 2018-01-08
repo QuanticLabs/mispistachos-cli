@@ -8,7 +8,8 @@ var _name = "k8s"
 
 var _options = [
   new scope.Option("d", "deployment", "Deployment name"),
-  new scope.Option("c", "container", "Container name. Current repository name by default")
+  new scope.Option("c", "container", "Container name. Current repository name by default"),
+  new scope.Option("n", "namespace", "Namespace name. 'default' by default")
 ] 
 
 module.exports = {

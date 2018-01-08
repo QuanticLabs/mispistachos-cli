@@ -11,7 +11,7 @@ var Docker = function(){
   this.getPodNames = function(containerName){
     var podNames = [];
     
-    cmd.sync('docker ps -f "name=web" --format "{{.Names}}"', function(err, stdout, stderr, status){
+    cmd.sync('docker ps -f "name='+containerName+'" --format "{{.Names}}"', function(err, stdout, stderr, status){
       podNames = stdout.trim().split("\n");
     })
 

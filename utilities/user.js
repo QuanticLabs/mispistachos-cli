@@ -54,8 +54,21 @@ var User = function(){
     return deploymentName
   }
 
-  this.getPod = function(containerName, deploymentName, namespace){
-    var podNames = k8s.getPodNames(containerName, deploymentName, namespace)
+  this.getNamespace = function(userNamespaceFlagValue){
+     var namespaceName = null
+
+    if(!!userNamespaceFlagValue && userNamespaceFlagValue !== true){
+      namespaceName = userNamespaceFlagValue
+    }
+
+    return namespaceName
+  }
+
+
+
+
+  this.getPod = function(containerName, deploymentName, namespaceName){
+    var podNames = k8s.getPodNames(containerName, deploymentName, namespaceName)
 
   
     if(podNames.length == 0){

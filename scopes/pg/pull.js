@@ -5,7 +5,7 @@ var gcloud = require(__base+'utilities/gcloud.js')
 var Yaml = require(__base+'utilities/yaml.js')
 
 var checkIfContainerRunning = function(containerName){
-  var command = "docker ps -f \"name=" + containerName + "\""
+  var command = "docker ps -f \"name=_" + containerName + "\""
   console.log("Executing:");
   console.log(command);
   var ret = false;
@@ -25,11 +25,13 @@ var checkIfContainerRunning = function(containerName){
   return ret
 }
 
-var run = function(skipBackupFlagValue){
+var run = function(skipBackupFlagValue, userNamespaceFlagValue){
   var postgresContainerName = userUtils.getContainer("postgres")
   var cronContainerName = userUtils.getContainer("cron")
   var webContainerName = userUtils.getContainer("web")
   var deploymentName = userUtils.getDeployment(null)
+  var namespaceName = userUtils.getNamespace(userNamespaceFlagValue)
+
 
   console.log("Checking if postgres container is running locally...")
 
@@ -68,8 +70,8 @@ var run = function(skipBackupFlagValue){
   }
   else{
     console.log("Searching pod for container '"+cronContainerName+"'")
-    var podName = userUtils.getPod(cronContainerName, deploymentName)
-    var remoteDumpAndBackupCommand = "kubectl exec -it "+podName+" -c "+cronContainerName+" /commands/dump_db_and_backup.sh"
+    var podName = userUtils.getPod(cronContainerName, deploymentName, namespaceName)
+    var remoteDumpAndBackupCommand = "kubectl exec -it "+podName+" -n "+namespaceName+" -c "+cronContainerName+" /commands/dump_db_and_backup.sh"
     console.log("Executing command:")
     console.log("  " + remoteDumpAndBackupCommand)
     console.log("")
@@ -158,7 +160,7 @@ var load = function(program){
   .command('pull')
   .description('Copy kubernetes database into a local postgres container')
   .action(function(command, params){
-    run(program.skipBackup)
+    run(program.skipBackup, program.namespace)
   })
   .on('--help', function(){
     console.log("    Check 'mp pg -h' for global options")

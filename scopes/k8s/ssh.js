@@ -2,14 +2,15 @@ var userUtils = require(__base+'utilities/user.js')
 var k8s = require(__base+'utilities/k8s.js')
 var cmd = require(__base+'utilities/cmd.js')
 
-var run = function(userContainerFlagValue, userDeploymentFlagValue){
+var run = function(userContainerFlagValue, userDeploymentFlagValue, userNamespaceFlagValue){
   var containerName = userUtils.getContainer(userContainerFlagValue)
   var deploymentName = userUtils.getDeployment(userDeploymentFlagValue)
+  var namespaceName = userUtils.getNamespace(userNamespaceFlagValue)
 
 
   console.log("Searching pod for container '"+containerName+"'")
 
-  var podName = userUtils.getPod(containerName, deploymentName)
+  var podName = userUtils.getPod(containerName, deploymentName, namespaceName)
 
   var fullCommand = "kubectl exec -it "+podName+" -c "+containerName+" bash"
   console.log("Executing command:")
@@ -18,9 +19,10 @@ var run = function(userContainerFlagValue, userDeploymentFlagValue){
   console.log("")
 
   
+
   var params = ['exec', '-it', podName, '-c', containerName, 'bash']
   cmd.execRemote('kubectl', params)
-
+  //kubectl exec -it podname -c web bash
 }
 
 var load= function(program){
@@ -29,7 +31,7 @@ var load= function(program){
   .alias('bash')
   .description('SSH to a specific remote container')
   .action(function(){
-    run(program.container, program.deployment)
+    run(program.container, program.deployment, program.namespace)
   })
   .on('--help', function(){
     console.log("    Check 'mp k -h' for global options")

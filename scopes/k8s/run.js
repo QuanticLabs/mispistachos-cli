@@ -2,14 +2,16 @@ var k8s = require(__base+'utilities/k8s.js')
 var cmd = require(__base+'utilities/cmd.js')
 var userUtils = require(__base+'utilities/user.js')
 
-var run = function(command, userContainerFlagValue, userDeploymentFlagValue){
+var run = function(command, userContainerFlagValue, userDeploymentFlagValue, userNamespaceFlagValue){
   var containerName = userUtils.getContainer(userContainerFlagValue)
   var deploymentName = userUtils.getDeployment(userDeploymentFlagValue)
+  var namespaceName = userUtils.getNamespace(userNamespaceFlagValue)
+  
 
 
   console.log("Searching pod for container '"+containerName+"'")
 
-  var podName = userUtils.getPod(containerName, deploymentName)
+  var podName = userUtils.getPod(containerName, deploymentName, namespaceName)
 
   var command = userUtils.refactorCommand(command)
 
@@ -33,7 +35,7 @@ var load= function(program){
     var ps = params || []
     ps.unshift(command)
     var fullCommand = ps.join(" ")
-    run(fullCommand, program.container, program.deployment)
+    run(fullCommand, program.container, program.deployment, program.namespace)
   })
   .on('--help', function(){
     console.log("    Check 'mp k -h' for global options")
