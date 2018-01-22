@@ -55,7 +55,7 @@ var User = function(){
   }
 
   this.getNamespace = function(userNamespaceFlagValue){
-     var namespaceName = null
+     var namespaceName = "default"
 
     if(!!userNamespaceFlagValue && userNamespaceFlagValue !== true){
       namespaceName = userNamespaceFlagValue

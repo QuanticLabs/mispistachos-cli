@@ -13,7 +13,7 @@ var run = function(userContainerFlagValue, userDeploymentFlagValue, userNamespac
 
   var podName = userUtils.getPod(containerName, deploymentName, namespaceName)
 
-  var fullCommand = "kubectl exec -it "+podName+" -c "+containerName+" -- tail -f log/production.log"
+  var fullCommand = "kubectl exec -it "+podName+"-n "+namespaceName+" -c "+containerName+" -- tail -f log/production.log"
   console.log("Executing command:")
   console.log("  " + fullCommand)
   console.log("")
