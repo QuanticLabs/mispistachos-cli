@@ -12,7 +12,7 @@ var run = function(userContainerFlagValue, userDeploymentFlagValue, userNamespac
 
   var podName = userUtils.getPod(containerName, deploymentName, namespaceName)
 
-  var fullCommand = "kubectl exec -it "+podName+" -c "+containerName+" bash"
+  var fullCommand = "kubectl exec -it "+podName+" -c "+containerName+" -n "+namespaceName+" bash"
   console.log("Executing command:")
   console.log("  " + fullCommand)
   console.log("")
@@ -20,7 +20,7 @@ var run = function(userContainerFlagValue, userDeploymentFlagValue, userNamespac
 
   
 
-  var params = ['exec', '-it', podName, '-c', containerName, 'bash']
+  var params = ['exec', '-it', podName, '-c', containerName, '-n', namespaceName, 'bash']
   cmd.execRemote('kubectl', params)
   //kubectl exec -it podname -c web bash
 }
