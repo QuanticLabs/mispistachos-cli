@@ -12,15 +12,15 @@ var run = function(userContainerFlagValue, userDeploymentFlagValue, userNamespac
   console.log("Searching pod for container '"+containerName+"'")
 
   var podName = userUtils.getPod(containerName, deploymentName, namespaceName)
-
-  var fullCommand = "kubectl logs -n " + namespaceName + " -f "+ podName
+  var lastNLines = '20'
+  var fullCommand = "kubectl logs --tail " + lastNLines + " -n " + namespaceName + " -f "+ podName
   // var fullCommand = "kubectl exec -it "+podName+"-n "+namespaceName+" -c "+containerName+" -- tail -f log/production.log"
   console.log("Executing command:")
   console.log("  " + fullCommand)
   console.log("")
   console.log("")
 
-  var params = ['logs', '-n', namespaceName, '-f', podName]
+  var params = ['logs', '--tail', lastNLines,'-n', namespaceName, '-f', podName]
   cmd.execRemote('kubectl', params)
 }
 
