@@ -4,19 +4,13 @@ var userUtils = require(__base+'utilities/user.js')
 var run = function(userContainerFlagValue, newContainerFlagValue){
 
   var containerName = userUtils.getContainer(userContainerFlagValue)
-  var command       = "tail -f log/development.log"
 
+  "docker-compose logs -f --tail=20 active-admin"
 
   var fullCommand = null
   var params = null
-  if(!!newContainerFlagValue){
-    fullCommand = "docker-compose run --rm "+containerName+" "+command
-    params = ['run', '--rm', containerName]
-  }else{
-    fullCommand = "docker-compose exec "+containerName+" "+command
-    params = ['exec', containerName]
-  }
-  params = params.concat(command.split(" "))
+  fullCommand = "docker-compose logs -f --tail=20 "+containerName
+  params = ['logs', '-f', '--tail=20', containerName]
 
   console.log("Executing command:")
   console.log("  " + fullCommand)

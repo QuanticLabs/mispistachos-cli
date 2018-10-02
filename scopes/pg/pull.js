@@ -1,7 +1,6 @@
 var k8s = require(__base+'utilities/k8s.js')
 var cmd = require(__base+'utilities/cmd.js')
 var userUtils = require(__base+'utilities/user.js')
-var gcloud = require(__base+'utilities/gcloud.js')
 var Yaml = require(__base+'utilities/yaml.js')
 
 var checkIfContainerRunning = function(containerName){
@@ -118,6 +117,7 @@ var run = function(skipBackupFlagValue, userNamespaceFlagValue, keepFileFlagValu
   console.log("Executing command:")
   console.log("  " + restoreDatabase)
   cmd.sync(restoreDatabase, function(err,stdout,stderr){
+    console.log(stdout)
     if(stdout.indexOf("error has occurred.") > -1){
       databaseRestored = false;
     }
