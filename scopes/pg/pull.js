@@ -25,7 +25,9 @@ var checkIfContainerRunning = function(containerName){
   return ret
 }
 
-var run = function(skipBackupFlagValue, userNamespaceFlagValue){
+var run = function(skipBackupFlagValue, userNamespaceFlagValue, keepFileFlagValue){
+
+  
   var postgresContainerName = userUtils.getContainer("postgres")
   var deploymentName = userUtils.getDeployment(null)
   var namespaceName = userUtils.getNamespace(userNamespaceFlagValue)
@@ -46,46 +48,9 @@ var run = function(skipBackupFlagValue, userNamespaceFlagValue){
   console.log("");
 
   var timestamp = new Date().getTime().toString()
-  var fileName = 'dump-'+timestamp+'.dump'
+  var fileName = timestamp+'.dump'
   var remoteDumpPath = '/db_dumps/'+fileName
   var localDumpPath = './db_dumps/'+fileName
-
-  console.log("Checking remote dump folder...")
-  cmd.sync("kubectl exec -it "+postgresPodName+" -n "+namespaceName+" -c "+postgresContainerName+" -- mkdir -p /db_dumps", function(err, stdout, stderr){
-    console.log(stdout);
-    console.log('Dump folder checked')
-  })
-    
-  var remoteDumpAndBackupCommand = "kubectl exec -it "+postgresPodName+" -n "+namespaceName+" -c "+postgresContainerName+" -- pg_dump -Fc -U postgres -f "+remoteDumpPath + " " + remoteDatabaseName
-  console.log("Creating dump file in k8s container...")
-  console.log("Executing command:")
-  console.log("  " + remoteDumpAndBackupCommand)
-  console.log("")
-  console.log("")
-
-  backupDone = true;
-  cmd.sync(remoteDumpAndBackupCommand, function(err, stdout, stderr){
-    if(stderr || err){
-      console.log(stderr)
-      console.log("Error: Dump file could not be created")
-      process.exit();
-    }
-    console.log('Backup created')
-  })
-
-  if(backupDone === false){
-    console.log("Error creating database backup ");
-    process.exit();
-  }
-
-  var copyDumpCommand = 'kubectl cp '+namespaceName+'/'+postgresPodName+':'+remoteDumpPath+' '+localDumpPath+' -c postgres'
-  console.log('Copying dump file to local folder, path='+localDumpPath)
-  console.log('  '+ copyDumpCommand)
-  cmd.sync(copyDumpCommand, function(err, stdout, stderr){
-    console.log(stdout);
-    console.log(stderr);
-    console.log('Dump file copied')
-  })
 
   console.log("Droping local database");
   var databaseRereated = true;
@@ -100,23 +65,52 @@ var run = function(skipBackupFlagValue, userNamespaceFlagValue){
       databaseRereated = false;
     }
   });
+
   console.log("");
-  var createDatabase = "docker-compose exec "+postgresContainerName+" createdb -h postgres -U postgres "+localDatabaseName
+  var createDatabaseCommand = "docker-compose exec "+postgresContainerName+" createdb -h postgres -U postgres "+localDatabaseName
   console.log("Creating empty database");
   console.log("Executing command:")
-  console.log("  " + createDatabase)
-  cmd.sync(createDatabase, function(err,stdout,stderr){
-    console.log(stdout);
-    console.log(stderr);
-    // console.log(stderr);
-    if(stdout.indexOf("error has occurred.") > -1){
-      databaseRereated = false;
+  console.log("  " + createDatabaseCommand)
+  cmd.sync(createDatabaseCommand, function(err,stdout,stderr){
+    console.log(stdout)
+    if(stderr || err){
+      console.log(stderr)
+      console.log("Error: Empty database could not be created")
+      process.exit();
     }
   });
-  if(databaseRereated === false){
-    console.log("Error recreating database "+localDatabaseName);
-    process.exit();
-  }
+
+  console.log("Checking remote dump folder...")
+  cmd.sync("kubectl exec -it "+postgresPodName+" -n "+namespaceName+" -c "+postgresContainerName+" -- mkdir -p /db_dumps", function(err, stdout, stderr){
+    console.log('Dump folder checked')
+  })
+    
+  var remoteDumpAndBackupCommand = "kubectl exec -it "+postgresPodName+" -n "+namespaceName+" -c "+postgresContainerName+" -- pg_dump -Fc -U postgres -f "+remoteDumpPath + " " + remoteDatabaseName
+  console.log("Creating dump file in k8s container...")
+  console.log("Executing command:")
+  console.log("  " + remoteDumpAndBackupCommand)
+  console.log("")
+
+  cmd.sync(remoteDumpAndBackupCommand, function(err, stdout, stderr){
+    if(stderr || err){
+      console.log(stderr)
+      console.log("Error: Dump file could not be created")
+      process.exit();
+    }
+    console.log('Backup created')
+  })
+
+  var copyDumpCommand = 'kubectl cp '+namespaceName+'/'+postgresPodName+':'+remoteDumpPath+' '+localDumpPath+' -c postgres'
+  console.log('Copying dump file to local folder, path='+localDumpPath)
+  console.log('  '+ copyDumpCommand)
+  cmd.sync(copyDumpCommand, function(err, stdout, stderr){
+    console.log(stdout);
+    console.log(stderr);
+    console.log('Dump file copied')
+  })
+
+  
+
 
   console.log("Loading dump in local development database");
   var databaseRestored = true;
@@ -124,20 +118,28 @@ var run = function(skipBackupFlagValue, userNamespaceFlagValue){
   console.log("Executing command:")
   console.log("  " + restoreDatabase)
   cmd.sync(restoreDatabase, function(err,stdout,stderr){
-    console.log(stdout);
-    console.log(stderr);
-    console.log(err);
     if(stdout.indexOf("error has occurred.") > -1){
       databaseRestored = false;
     }
   });
 
-  if(databaseRereated === false){
-    console.log("Error restoring the database.");
+  console.log('Deleting dump in remote container')
+  var deleteRemoteDumpCommand = "kubectl exec -it "+postgresPodName+" -n "+namespaceName+" -c "+postgresContainerName+" -- rm "+remoteDumpPath
+  cmd.sync(deleteRemoteDumpCommand, function(err,stdout,stderr){
+    
+  });
+
+  if(keepFileFlagValue){
+    console.log('Skip local dump file delete (--keep option)')
+  }else{
+    console.log('Deleting dump in local container')
+    var deleteLocalDumpCommand = "rm "+localDumpPath
+    cmd.sync(deleteLocalDumpCommand, function(err,stdout,stderr){
+     
+    });
+
   }
-  else{
-    console.log("Successfully pulled the database!");
-  }
+  console.log("Successfully pulled the database!");
 }
 
 var load = function(program){
@@ -145,7 +147,7 @@ var load = function(program){
   .command('pull')
   .description('Copy kubernetes database into a local postgres container')
   .action(function(command, params){
-    run(program.skipBackup, program.namespace)
+    run(program.skipBackup, program.namespace, !!program.keep)
   })
   .on('--help', function(){
     console.log("    Check 'mp pg -h' for global options")

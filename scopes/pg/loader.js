@@ -7,7 +7,8 @@ var _name  = "postgres"
 
 var _options = [
   new scope.Option("s", "skipBackup", "Do not make a new backup and use the last one."),
-  new scope.Option("n", "namespace", "Namespace name. 'default' by default")
+  new scope.Option("n", "namespace", "Namespace name. 'default' by default"),
+  new scope.Option("k", "keep", "Keep local dump after pg pull. False by default")
 ] 
 
 module.exports = {
