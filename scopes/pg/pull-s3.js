@@ -27,11 +27,11 @@ var checkIfContainerRunning = function(containerName){
 
 var run = function(skipBackupFlagValue, userNamespaceFlagValue){
   var postgresContainerName = userUtils.getContainer("postgres")
+  var cronContainerName = userUtils.getContainer("cron")
+  var webContainerName = userUtils.getContainer("web")
   var deploymentName = userUtils.getDeployment(null)
   var namespaceName = userUtils.getNamespace(userNamespaceFlagValue)
-  var postgresPodName = userUtils.getPod(postgresContainerName, deploymentName, namespaceName)
-  var remoteDatabaseName = 'app_production'
-  var localDatabaseName = 'app_development'
+
 
   console.log("Checking if postgres container is running locally...")
 
@@ -42,91 +42,106 @@ var run = function(skipBackupFlagValue, userNamespaceFlagValue){
     process.exit();
   }
 
+  console.log("");
+
+  console.log("Checking if web is stopped locally...")
+  if(checkIfContainerRunning("web")){
+    console.log("Error: you must stop web container")
+    process.exit();
+  }else{
+    console.log("Done!")
+  }
 
   console.log("");
 
-  var timestamp = new Date().getTime().toString()
-  var fileName = 'dump-'+timestamp+'.dump'
-  var remoteDumpPath = '/db_dumps/'+fileName
-  var localDumpPath = './db_dumps/'+fileName
-
-  console.log("Checking remote dump folder...")
-  cmd.sync("kubectl exec -it "+postgresPodName+" -n "+namespaceName+" -c "+postgresContainerName+" -- mkdir -p /db_dumps", function(err, stdout, stderr){
-    console.log(stdout);
-    console.log('Dump folder checked')
-  })
-    
-  var remoteDumpAndBackupCommand = "kubectl exec -it "+postgresPodName+" -n "+namespaceName+" -c "+postgresContainerName+" -- pg_dump -Fc -U postgres -f "+remoteDumpPath + " " + remoteDatabaseName
-  console.log("Creating dump file in k8s container...")
-  console.log("Executing command:")
-  console.log("  " + remoteDumpAndBackupCommand)
-  console.log("")
-  console.log("")
-
-  backupDone = true;
-  cmd.sync(remoteDumpAndBackupCommand, function(err, stdout, stderr){
-    if(stderr || err){
-      console.log(stderr)
-      console.log("Error: Dump file could not be created")
-      process.exit();
-    }
-    console.log('Backup created')
-  })
-
-  if(backupDone === false){
-    console.log("Error creating database backup ");
+  console.log("Checking if sidekiq is stopped locally...")
+  if(checkIfContainerRunning("sidekiq")){
+    console.log("Error: you must stop sidekiq container")
     process.exit();
+  }else{
+    console.log("Done!")
   }
 
-  var copyDumpCommand = 'kubectl cp '+namespaceName+'/'+postgresPodName+':'+remoteDumpPath+' '+localDumpPath+' -c postgres'
-  console.log('Copying dump file to local folder, path='+localDumpPath)
-  console.log('  '+ copyDumpCommand)
-  cmd.sync(copyDumpCommand, function(err, stdout, stderr){
-    console.log(stdout);
-    console.log(stderr);
-    console.log('Dump file copied')
-  })
+  console.log("");
 
-  console.log("Droping local database");
+  if(!!skipBackupFlagValue){
+    console.log("Skipping the creation of a new backup.")
+    console.log("");
+  }
+  else{
+    console.log("Searching pod for container '"+cronContainerName+"'")
+    var podName = userUtils.getPod(cronContainerName, deploymentName, namespaceName)
+    var remoteDumpAndBackupCommand = "kubectl exec -it "+podName+" -n "+namespaceName+" -c "+cronContainerName+" /commands/dump_db_and_backup.sh"
+    console.log("Executing command:")
+    console.log("  " + remoteDumpAndBackupCommand)
+    console.log("")
+    console.log("")
+
+    backupDone = true;
+    cmd.sync(remoteDumpAndBackupCommand, function(err, stdout, stderr){
+      console.log(stdout);
+      if(stdout.indexOf("error has occurred.") > -1){
+        backupDone = false;
+      }
+    })
+
+    if(backupDone === false){
+      console.log("Error creating database backup ");
+      process.exit();
+    }
+
+    console.log("Database backup ready");
+    console.log("");
+  }
+
+  console.log("Recreating the development database");
   var databaseRereated = true;
-  var dropDatabase = "docker-compose exec "+postgresContainerName+" dropdb -h postgres -U postgres "+localDatabaseName
+  var dropDatabase = "docker-compose run --rm "+cronContainerName+" dropdb -h postgres -U postgres app_development"
   console.log("Executing command:")
   console.log("  " + dropDatabase)
   cmd.sync(dropDatabase, function(err,stdout,stderr){
     console.log(stdout);
-    console.log(stderr);
     // console.log(stderr);
     if(stdout.indexOf("error has occurred.") > -1){
       databaseRereated = false;
     }
   });
   console.log("");
-  var createDatabase = "docker-compose exec "+postgresContainerName+" createdb -h postgres -U postgres "+localDatabaseName
-  console.log("Creating empty database");
+  var createDatabase = "docker-compose run --rm "+cronContainerName+" createdb -h postgres -U postgres app_development"
   console.log("Executing command:")
   console.log("  " + createDatabase)
   cmd.sync(createDatabase, function(err,stdout,stderr){
     console.log(stdout);
-    console.log(stderr);
     // console.log(stderr);
     if(stdout.indexOf("error has occurred.") > -1){
       databaseRereated = false;
     }
   });
   if(databaseRereated === false){
-    console.log("Error recreating database "+localDatabaseName);
+    console.log("Error recreating database app_development ");
     process.exit();
   }
 
-  console.log("Loading dump in local development database");
+  currentProject = gcloud.getCurrentProject();
+  console.log("The following variable should be equal to the CURRENT_PROJECT environment variable on k8s. You can check it with 'kubectl proxy' and checking the secrets.");
+  console.log("currentProject: ",currentProject)
+
+  // We get the Amazon Credentials from the root folder
+  var configPath = process.cwd()+"/config/s3.yml"
+  var yaml = new Yaml(configPath)
+  yaml.load()
+  console.log("\nS3 variables to use:")
+  yaml.print()
+  console.log("")
+  var envVars = yaml.values
+
+  console.log("Restoring the development database");
   var databaseRestored = true;
-  var restoreDatabase = "docker-compose exec -T postgres pg_restore -U postgres -d "+localDatabaseName+" "+localDumpPath
+  var restoreDatabase = "docker-compose run --rm -e S3_KEY_ID="+envVars['S3_KEY_ID']+" -e S3_SECRET_ACCESS_KEY="+envVars['S3_SECRET_ACCESS_KEY']+" -e BUCKET_NAME="+envVars['BUCKET_NAME']+" -e CURRENT_PROJECT="+currentProject+" cron /commands/restore_last_backup.sh"
   console.log("Executing command:")
   console.log("  " + restoreDatabase)
   cmd.sync(restoreDatabase, function(err,stdout,stderr){
     console.log(stdout);
-    console.log(stderr);
-    console.log(err);
     if(stdout.indexOf("error has occurred.") > -1){
       databaseRestored = false;
     }
@@ -142,7 +157,7 @@ var run = function(skipBackupFlagValue, userNamespaceFlagValue){
 
 var load = function(program){
   program
-  .command('pull')
+  .command('pull-s3')
   .description('Copy kubernetes database into a local postgres container')
   .action(function(command, params){
     run(program.skipBackup, program.namespace)
@@ -152,8 +167,8 @@ var load = function(program){
     console.log('');
     console.log('  Examples:');
     console.log('');
-    console.log('    $ mp pg pull');
-    console.log('    $ mp pg pull -s');
+    console.log('    $ mp pg pull-s3');
+    console.log('    $ mp pg pull-s3 -s');
     console.log('')
     console.log('    To change the current project, look:')
     console.log('      $ mp p set -h')
