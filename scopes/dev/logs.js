@@ -1,16 +1,15 @@
 var cmd = require(__base+'utilities/cmd.js')
 var userUtils = require(__base+'utilities/user.js')
 
-var run = function(userContainerFlagValue, newContainerFlagValue){
+var run = function(userContainerFlagValue, newContainerFlagValue, linesToShow){
 
   var containerName = userUtils.getContainer(userContainerFlagValue)
 
-  "docker-compose logs -f --tail=20 active-admin"
-
   var fullCommand = null
   var params = null
-  fullCommand = "docker-compose logs -f --tail=20 "+containerName
-  params = ['logs', '-f', '--tail=20', containerName]
+  var lines = linesToShow || 20
+  fullCommand = "docker-compose logs -f --tail="+lines+" "+containerName
+  params = ['logs', '-f', '--tail='+lines, containerName]
 
   console.log("Executing command:")
   console.log("  " + fullCommand)
@@ -25,9 +24,10 @@ var run = function(userContainerFlagValue, newContainerFlagValue){
 var load= function(program){
   program
   .command('logs [PARAMS...]')
+  .option("-l, --lines [lines]", "Lines number to show")
   .description('View development log file')
-  .action(function(params){
-    run(program.container, program.new)
+  .action(function(params, command){
+    run(program.container, program.new, command.lines)
   })
   .on('--help', function(){
     console.log("    Check 'mp dev -h' for global options")
