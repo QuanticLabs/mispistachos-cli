@@ -108,9 +108,6 @@ var run = function(skipBackupFlagValue, userNamespaceFlagValue, keepFileFlagValu
     console.log('Dump file copied')
   })
 
-  
-
-
   console.log("Loading dump in local development database");
   var databaseRestored = true;
   var restoreDatabase = "docker-compose exec -T postgres pg_restore -U postgres -d "+localDatabaseName+" "+localDumpPath
@@ -118,9 +115,9 @@ var run = function(skipBackupFlagValue, userNamespaceFlagValue, keepFileFlagValu
   console.log("  " + restoreDatabase)
   cmd.sync(restoreDatabase, function(err,stdout,stderr){
     console.log(stdout)
-    if(stdout.indexOf("error has occurred.") > -1){
-      databaseRestored = false;
-    }
+    console.log(err)
+    console.log(stderr)
+    
   });
 
   console.log('Deleting dump in remote container')
