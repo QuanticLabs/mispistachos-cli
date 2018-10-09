@@ -60,8 +60,9 @@ var run = function(skipBackupFlagValue, userNamespaceFlagValue, keepFileFlagValu
     console.log(stdout);
     console.log(stderr);
     // console.log(stderr);
-    if(stdout.indexOf("error has occurred.") > -1){
-      databaseRereated = false;
+    
+    if(stdout.indexOf("ERROR") > -1){
+      process.exit()
     }
   });
 
@@ -76,6 +77,9 @@ var run = function(skipBackupFlagValue, userNamespaceFlagValue, keepFileFlagValu
       console.log(stderr)
       console.log("Error: Empty database could not be created")
       process.exit();
+    }
+    if(stdout.indexOf("ERROR") > -1){
+      process.exit()
     }
   });
 
